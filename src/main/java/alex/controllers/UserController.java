@@ -57,12 +57,12 @@ public class UserController {
 
 
     @PostMapping("/{id}/add")
-    public String create(@PathVariable(value = "id") int id, @RequestParam("title") String title,
+    public String create(@PathVariable(value = "id") int id, @RequestParam("messid") int messid,
                                       @RequestParam("access_token") String accessToken, Model model) {
 
 
         User user = userService.getById(id);
-        user.getMessengers().add(messengerService.getByName(title));
+        user.getMessengers().add(messengerService.getById(messid));
 
         userService.editUser(user);
 
