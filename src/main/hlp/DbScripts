@@ -1,0 +1,42 @@
+create table users(
+    id serial primary key,
+    token text,
+    first_name text,
+    last_name text
+);
+
+create table messenger(
+    id serial primary key,
+    title text,
+    icon text
+);
+
+create table users_messengers(
+    id serial primary key,
+    user_id integer references users (id),
+    messenger_id integer references messenger (id),
+    access_token text
+);
+
+
+
+insert into public.user(first_name, last_name) values
+('Alex', 'Trsv'),
+('Roman', 'Atikeev'),
+('Tema', 'Kulbako');
+
+insert into messenger(title) values
+('Vk'),
+('Telegram'),
+('Whats up');
+
+insert into users_messengers(user_id, messenger_id) values
+((select id from public.user where first_name = 'Alex'),(select id from messenger where title = 'Vk')),
+((select id from public.user where first_name = 'Alex'),(select id from messenger where title = 'Telegram')),
+((select id from public.user where first_name = 'Roman'),(select id from messenger where title = 'Vk')),
+((select id from public.user where first_name = 'Roman'),(select id from messenger where title = 'Telegram')),
+((select id from public.user where first_name = 'Roman'),(select id from messenger where title = 'Whats up')),
+((select id from public.user where first_name = 'Tema'),(select id from messenger where title = 'Vk'));
+
+select first_name from public.user where id in (select user_id from users_messengers where messenger_id =
+(select id from messenger where title = 'Vk'));

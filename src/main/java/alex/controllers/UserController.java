@@ -66,7 +66,7 @@ public class UserController {
 
         userService.editUser(user);
 
-        return "redirect:/users/{id}/messengers";
+        return "redirect:/users/{id}/messengers";   
     }
 
 
