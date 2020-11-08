@@ -17,6 +17,10 @@ public class User {
     private String lastName;
     @Column(name = "token")
     private String token;
+//    @Transient
+    @Column(name = "phone")
+    private Integer phone;
+
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "users_messengers",
@@ -26,18 +30,27 @@ public class User {
     private Collection<Messenger> messengers;
 
 
-    protected User() {
+    public User() {
     }
 
-    protected User(String firstName, String lastName, String token) {
+    protected User(String firstName, String lastName, String token, int phone) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.token = token;
+        this.phone = phone;
     }
 
 
     public Collection<Messenger> getMessengers() {
         return messengers;
+    }
+
+    public Integer getPhone() {
+        return phone;
+    }
+
+    public void setPhone(Integer phone) {
+        this.phone = phone;
     }
 
     public void setMessengers(Collection<Messenger> messengers) {

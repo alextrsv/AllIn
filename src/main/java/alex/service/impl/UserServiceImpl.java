@@ -30,6 +30,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void delete(String token) {
+        userRepository.deleteByToken(token);
+    }
+
+    @Override
     public User getByName(String name) {
         return userRepository.findByName(name);
     }
@@ -48,6 +53,8 @@ public class UserServiceImpl implements UserService {
     public List<User> getAll() {
         return (List<User>) userRepository.findAll();
     }
+
+
 
 //    @Override
 //    public void update(User user) {
