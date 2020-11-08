@@ -90,5 +90,5 @@ public class UserController {
         return "redirect:/users/{id}/messengers";
     }
 
-    //ПАСХАЛКА
+    //ПАСХАЛКА|HEROKU
 }
