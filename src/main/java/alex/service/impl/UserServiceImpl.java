@@ -40,6 +40,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getByToken(String token) {
+        return userRepository.findByToken(token);
+    }
+
+    @Override
     public User getById(int id) {
         return userRepository.findById(id).get();
     }

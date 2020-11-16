@@ -17,18 +17,13 @@ public class User {
     private String lastName;
     @Column(name = "token")
     private String token;
-//    @Transient
     @Column(name = "phone")
     private Integer phone;
 
-
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "users_messengers",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "messenger_id")
-    )
-    private Collection<Messenger> messengers;
-
+///////////////////////////////////////////////////////////////////////////
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Collection<UsersMessengers> usMes;
+///////////////////////////////////////////////////////////////////////////
 
     public User() {
     }
@@ -41,8 +36,12 @@ public class User {
     }
 
 
-    public Collection<Messenger> getMessengers() {
-        return messengers;
+    public Collection<UsersMessengers> getUsMes() {
+        return usMes;
+    }
+
+    public void setUsMes(Collection<UsersMessengers> usMes) {
+        this.usMes = usMes;
     }
 
     public Integer getPhone() {
@@ -51,10 +50,6 @@ public class User {
 
     public void setPhone(Integer phone) {
         this.phone = phone;
-    }
-
-    public void setMessengers(Collection<Messenger> messengers) {
-        this.messengers = messengers;
     }
 
     public int getId() {

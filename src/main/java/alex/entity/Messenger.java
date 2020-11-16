@@ -1,5 +1,7 @@
 package alex.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Collection;
 
@@ -15,30 +17,31 @@ public class Messenger {
     @Column(name = "icon")
     private String icon;
 
-    @ManyToMany(mappedBy = "messengers")
-    private Collection<User> users;
+///////////////////////////////////////////////////////////////////////////
+    @JsonIgnore
+    @OneToMany(mappedBy = "messenger", fetch = FetchType.EAGER)
+    private Collection<UsersMessengers> usMes;
+///////////////////////////////////////////////////////////////////////////
+
 
     @Transient
     private boolean isActivated;
-
-    @Transient
-    private String accessToken;
 
 
     public Messenger() {
     }
 
-    public Messenger(String title, String accessToken) {
+
+    public Messenger(String title) {
         this.title = title;
-        this.accessToken = accessToken;
     }
 
-    public String getAccessToken() {
-        return accessToken;
+    public Collection<UsersMessengers> getUsMes() {
+        return usMes;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+    public void setUsMes(Collection<UsersMessengers> usMes) {
+        this.usMes = usMes;
     }
 
     public boolean isActivated() {

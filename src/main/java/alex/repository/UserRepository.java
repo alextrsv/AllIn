@@ -16,6 +16,9 @@ public interface UserRepository extends CrudRepository<User, Integer> {
     @Query("select u from User u where u.firstName = :name")
     User findByName(@Param("name") String name);
 
+    @Query("select u from User u where u.token = :token")
+    User findByToken(@Param("token") String token);
+
     @Transactional
     @Modifying
     @Query("DELETE FROM User WHERE token = :token")

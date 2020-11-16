@@ -2,13 +2,16 @@ package alex.controllers;
 
 import alex.entity.Messenger;
 import alex.entity.User;
+import alex.entity.UsersMessengers;
 import alex.service.MessengerService;
 import alex.service.UserService;
+import alex.service.UsersMessengersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -21,6 +24,9 @@ public class UserController {
 
     @Autowired
     private MessengerService messengerService;
+
+    @Autowired
+    private UsersMessengersService usersMessengersService;
 
 
 
@@ -46,6 +52,7 @@ public class UserController {
 
     @DeleteMapping()
     public String removeUser(@RequestHeader("Authorization") String token){
+        usersMessengersService.deleteByUserId(userService.getByToken(token).getId());
         userService.delete(token);
         return "redirect:/users";
     }
@@ -54,7 +61,13 @@ public class UserController {
     @ResponseBody
     public Iterable<Messenger> userMess(@PathVariable(value = "id") int id, Model model) {
         User user = userService.getById(id);
-        Collection<Messenger> usrMessengers = user.getMessengers();
+        Collection<UsersMessengers> usersMessengersCollection = user.getUsMes();// коллекция свзяей
+        Collection<Messenger> usrMessengers = new ArrayList<>();//пустая коллекция для мессенджеров
+
+        for (UsersMessengers usMes: usersMessengersCollection) {//заполнение коллекции мессенджеров из коллекции связей
+            usrMessengers.add(usMes.getMessenger());
+        }
+
         Iterable<Messenger> allMessengers = messengerService.getAll();
         for (Messenger mess: allMessengers) {
             mess.setActivated(usrMessengers.contains(mess));
@@ -69,23 +82,31 @@ public class UserController {
 
 
         User user = userService.getById(id);
-        user.getMessengers().add(messengerService.getById(messid));
+        Messenger messenger = messengerService.getById(messid);
+        UsersMessengers newUsersMessengers = new UsersMessengers();
 
-        userService.editUser(user);
+        newUsersMessengers.setUser(user);
+        newUsersMessengers.setMessenger(messenger);
+        newUsersMessengers.setAccessToken(Integer.parseInt(accessToken));
+
+        usersMessengersService.editUsersMessengers(newUsersMessengers);
+
 
         return "redirect:/users/{id}/messengers";   
     }
 
 
-    @DeleteMapping("/{id}/messengers/{messid}")
+    @DeleteMapping("/{id}/messengers/{messid}")//////////////////////////////////////////////////////////////////////////////////////////////
     public String removeMessenger(@PathVariable(value = "id") int id,
                          @RequestHeader("messid") int messid, Model model) {
 
 
         User user = userService.getById(id);
-        user.getMessengers().remove(messengerService.getById(messid));
-
-        userService.editUser(user);
+        Messenger messenger = messengerService.getById(messid);
+        UsersMessengers usersMessengers = usersMessengersService.getByUIdMId(id, messid);
+        usersMessengersService.delete(usersMessengersService.getByUIdMId(id, messid).getId());
+//        user.getMessengers().remove(messengerService.getById(messid));
+//        userService.editUser(user);
 
         return "redirect:/users/{id}/messengers";
     }
