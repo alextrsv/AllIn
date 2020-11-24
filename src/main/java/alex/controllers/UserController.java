@@ -38,8 +38,8 @@ public class UserController {
     }
 
 
-    @PostMapping()
-    public String AddUser(@RequestHeader("Authorization") String token, @RequestParam("phone") int phone){
+    @PostMapping("/add")
+    public String addUser(@RequestHeader("Authorization") String token, @RequestParam("phone") int phone){
         User newUser = new User();
         newUser.setToken(token);
         newUser.setPhone(phone);
@@ -50,7 +50,7 @@ public class UserController {
 
     }
 
-    @DeleteMapping()
+    @DeleteMapping("/delete")
     public String removeUser(@RequestHeader("Authorization") String token){
         usersMessengersService.deleteByUserId(userService.getByToken(token).getId());
         userService.delete(token);
@@ -76,9 +76,9 @@ public class UserController {
     }
 
 
-    @PostMapping("/{id}/messengers")
-    public String addMessenger(@PathVariable(value = "id") int id, @RequestParam("messid") int messid,
-                                      @RequestParam("accessToken") String accessToken, Model model) {
+    @PostMapping("/{id}/messengers/add")
+    public String addMessenger(@PathVariable(value = "id") int id, @RequestParam("id") int messid,
+                                      @RequestHeader("accessToken") String accessToken, Model model) {
 
 
         User user = userService.getById(id);
@@ -96,9 +96,9 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/{id}/messengers/{messid}")//////////////////////////////////////////////////////////////////////////////////////////////
-    public String removeMessenger(@PathVariable(value = "id") int id,
-                         @RequestHeader("messid") int messid, Model model) {
+    @DeleteMapping("/{id}/messengers/{messid}/delete")
+    public String removeMessenger(@PathVariable("id") int id,
+                         @PathVariable("messid") int messid, Model model) {
 
 
         User user = userService.getById(id);
