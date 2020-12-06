@@ -18,9 +18,9 @@ public class User {
     @Column(name = "token")
     private String token;
     @Column(name = "phone")
-    private Integer phone;
+    private String phone;
 
-///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<UsersMessengers> usMes;
 ///////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ public class User {
     public User() {
     }
 
-    protected User(String firstName, String lastName, String token, int phone) {
+    protected User(String firstName, String lastName, String token, String phone) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.token = token;
@@ -44,11 +44,11 @@ public class User {
         this.usMes = usMes;
     }
 
-    public Integer getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(Integer phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 

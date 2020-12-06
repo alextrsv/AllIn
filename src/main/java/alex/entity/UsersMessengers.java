@@ -1,11 +1,8 @@
 package alex.entity;
 
-import alex.entity.Messenger;
-import alex.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
 
 @Entity
 @Table(name = "users_messengers")
@@ -14,10 +11,10 @@ public class UsersMessengers {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(name = "access_token")
-    private Integer accessToken;
+    private String accessToken;
 
 
-///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private User user;
@@ -50,11 +47,11 @@ public class UsersMessengers {
         this.id = id;
     }
 
-    public Integer getAccessToken() {
+    public String getAccessToken() {
         return accessToken;
     }
 
-    public void setAccessToken(Integer accessToken) {
+    public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
 

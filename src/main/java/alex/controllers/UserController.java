@@ -11,6 +11,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,14 +42,22 @@ public class UserController {
     }
 
 
+//    @PostMapping("/add")
+//    public String addUser(@RequestHeader("Authorization") String token, @RequestParam("phone") String phone){
+//        User newUser = new User();
+//        newUser.setToken(token);
+//        newUser.setPhone(phone);
+//
+//        userService.addUser(newUser);
+//
+//        return "redirect:/users";
+//
+//    }
+
     @PostMapping("/add")
-    public String addUser(@RequestHeader("Authorization") String token, @RequestParam("phone") int phone){
-        User newUser = new User();
+    public String addUser(@RequestHeader("Authorization") String token, @RequestBody User newUser){
         newUser.setToken(token);
-        newUser.setPhone(phone);
-
         userService.addUser(newUser);
-
         return "redirect:/users";
 
     }
@@ -57,58 +69,97 @@ public class UserController {
         return "redirect:/users";
     }
 
-    @GetMapping(value = "/{id}/messengers")
+    @GetMapping("/no-user-error")
     @ResponseBody
-    public Iterable<Messenger> userMess(@PathVariable(value = "id") int id, Model model) {
-        User user = userService.getById(id);
-        Collection<UsersMessengers> usersMessengersCollection = user.getUsMes();// коллекция свзяей
-        Collection<Messenger> usrMessengers = new ArrayList<>();//пустая коллекция для мессенджеров
+    public String noUserError(Model model){
+        return "there is no such user";
+    }
 
-        for (UsersMessengers usMes: usersMessengersCollection) {//заполнение коллекции мессенджеров из коллекции связей
-            usrMessengers.add(usMes.getMessenger());
-        }
-
-        Iterable<Messenger> allMessengers = messengerService.getAll();
-        for (Messenger mess: allMessengers) {
-            mess.setActivated(usrMessengers.contains(mess));
-        }
-        return allMessengers;
+    @GetMapping("/messenger-already-exists-error")
+    @ResponseBody
+    public String messengerAlreadyExists(Model model){
+        return "this user already has this messenger";
     }
 
 
-    @PostMapping("/{id}/messengers/add")
-    public String addMessenger(@PathVariable(value = "id") int id, @RequestParam("id") int messid,
-                                      @RequestHeader("accessToken") String accessToken, Model model) {
 
+    @GetMapping(value = "/messengers")
+    @ResponseBody
+    public Iterable<Messenger> userMess(@RequestHeader("Authorization") String token , Model model, HttpServletResponse response) {
+        try {
+            User user = userService.getByToken(token);
+            Collection<UsersMessengers> usersMessengersCollection = user.getUsMes();// коллекция свзяей
+            Collection<Messenger> usrMessengers = new ArrayList<>();//пустая коллекция для мессенджеров
 
-        User user = userService.getById(id);
-        Messenger messenger = messengerService.getById(messid);
-        UsersMessengers newUsersMessengers = new UsersMessengers();
+            for (UsersMessengers usMes : usersMessengersCollection) {//заполнение коллекции мессенджеров из коллекции связей
+                usrMessengers.add(usMes.getMessenger());
+            }
 
-        newUsersMessengers.setUser(user);
-        newUsersMessengers.setMessenger(messenger);
-        newUsersMessengers.setAccessToken(Integer.parseInt(accessToken));
+            Iterable<Messenger> allMessengers = messengerService.getAll();
+            for (Messenger mess : allMessengers) {
+                mess.setActivated(usrMessengers.contains(mess));
+            }
+            return allMessengers;
+        }catch (java.lang.NullPointerException nullPointerException){
 
-        usersMessengersService.editUsersMessengers(newUsersMessengers);
-
-
-        return "redirect:/users/{id}/messengers";   
+            try {
+                response.sendRedirect("/users/no-user-error");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
 
-    @DeleteMapping("/{id}/messengers/{messid}/delete")
-    public String removeMessenger(@PathVariable("id") int id,
-                         @PathVariable("messid") int messid, Model model) {
+    @PostMapping("/messengers/add")
+    public String addMessenger(@RequestHeader("Authorization") String token, @RequestHeader("accessToken") String accessToken,
+                               @RequestBody Messenger mess, Model model, HttpServletResponse httpServletResponse) {
+
+        try {
+
+            User user = userService.getByToken(token);
+            Messenger messenger = messengerService.getById(mess.getId());
+            UsersMessengers newUsersMessengers = new UsersMessengers();
+
+            newUsersMessengers.setUser(user);
+            newUsersMessengers.setMessenger(messenger);
+            newUsersMessengers.setAccessToken(accessToken);
+
+            usersMessengersService.editUsersMessengers(newUsersMessengers);
+        }catch (RuntimeException e) {
+            Throwable rootCause = com.google.common.base.Throwables.getRootCause(e);
+            if (rootCause instanceof SQLException) {
+                if ("23505".equals(((SQLException) rootCause).getSQLState())) {
+                    return "redirect:/users/messenger-already-exists-error";
+//                try {
+//                    httpServletResponse.sendRedirect("/messenger-already-exists-error");
+//                } catch (IOException ioException) {
+//                    ioException.printStackTrace();
+//                }
+                }
+            }
+        }
+
+        return "redirect:/users";
+    }
 
 
-        User user = userService.getById(id);
+
+
+    @DeleteMapping("/messengers/{id}/delete")
+    public String removeMessenger(@RequestHeader("Authorization") String token,
+                                  @PathVariable("id") int messid, Model model) {
+
+
+        User user = userService.getByToken(token);
         Messenger messenger = messengerService.getById(messid);
-        UsersMessengers usersMessengers = usersMessengersService.getByUIdMId(id, messid);
-        usersMessengersService.delete(usersMessengersService.getByUIdMId(id, messid).getId());
+        UsersMessengers usersMessengers = usersMessengersService.getByUIdMId(user.getId(), messid);
+        usersMessengersService.delete(usersMessengers.getId());
 //        user.getMessengers().remove(messengerService.getById(messid));
 //        userService.editUser(user);
 
-        return "redirect:/users/{id}/messengers";
+        return "redirect:/users";
     }
 
     //ПАСХАЛКА|HEROKU
