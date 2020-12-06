@@ -8,10 +8,9 @@ import alex.service.UserService;
 import alex.service.UsersMessengersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -36,9 +35,8 @@ public class UserController {
 
     @GetMapping(produces = "application/json")
     @ResponseBody
-    public List<User> allUsers(Model model) {
-        List<User> users = userService.getAll();
-        return users;
+    public List<User> allUsers() {
+        return userService.getAll();
     }
 
 
@@ -71,13 +69,13 @@ public class UserController {
 
     @GetMapping("/no-user-error")
     @ResponseBody
-    public String noUserError(Model model){
+    public String noUserError(){
         return "there is no such user";
     }
 
     @GetMapping("/messenger-already-exists-error")
     @ResponseBody
-    public String messengerAlreadyExists(Model model){
+    public String messengerAlreadyExists(){
         return "this user already has this messenger";
     }
 
@@ -85,7 +83,7 @@ public class UserController {
 
     @GetMapping(value = "/messengers")
     @ResponseBody
-    public Iterable<Messenger> userMess(@RequestHeader("Authorization") String token , Model model, HttpServletResponse response) {
+    public Iterable<Messenger> userMess(@RequestHeader("Authorization") String token, HttpServletResponse response) {
         try {
             User user = userService.getByToken(token);
             Collection<UsersMessengers> usersMessengersCollection = user.getUsMes();// коллекция свзяей
@@ -114,7 +112,7 @@ public class UserController {
 
     @PostMapping("/messengers/add")
     public String addMessenger(@RequestHeader("Authorization") String token, @RequestHeader("accessToken") String accessToken,
-                               @RequestBody Messenger mess, Model model, HttpServletResponse httpServletResponse) {
+                               @RequestBody Messenger mess) {
 
         try {
 
@@ -132,35 +130,22 @@ public class UserController {
             if (rootCause instanceof SQLException) {
                 if ("23505".equals(((SQLException) rootCause).getSQLState())) {
                     return "redirect:/users/messenger-already-exists-error";
-//                try {
-//                    httpServletResponse.sendRedirect("/messenger-already-exists-error");
-//                } catch (IOException ioException) {
-//                    ioException.printStackTrace();
-//                }
                 }
             }
         }
-
         return "redirect:/users";
     }
-
 
 
 
     @DeleteMapping("/messengers/{id}/delete")
     public String removeMessenger(@RequestHeader("Authorization") String token,
-                                  @PathVariable("id") int messid, Model model) {
-
+                                  @PathVariable("id") int messid) {
 
         User user = userService.getByToken(token);
-        Messenger messenger = messengerService.getById(messid);
         UsersMessengers usersMessengers = usersMessengersService.getByUIdMId(user.getId(), messid);
         usersMessengersService.delete(usersMessengers.getId());
-//        user.getMessengers().remove(messengerService.getById(messid));
-//        userService.editUser(user);
 
         return "redirect:/users";
     }
-
-    //ПАСХАЛКА|HEROKU
 }
