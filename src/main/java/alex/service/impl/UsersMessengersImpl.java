@@ -52,4 +52,5 @@ public class UsersMessengersImpl implements UsersMessengersService {
     public void deleteByUserId(int user_id) {
         usersMessengersRepository.deleteByUserId(user_id);
     }
+
 }

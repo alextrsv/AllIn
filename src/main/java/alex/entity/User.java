@@ -20,6 +20,9 @@ public class User {
     @Column(name = "phone")
     private String phone;
 
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Collection<Category> categories;
     ///////////////////////////////////////////////////////////////////////////
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<UsersMessengers> usMes;
@@ -82,5 +85,13 @@ public class User {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Collection<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Collection<Category> categories) {
+        this.categories = categories;
     }
 }

@@ -20,6 +20,45 @@ create table users_messengers(
 
 
 
+CREATE TABLE category(
+        id SERIAL PRIMARY KEY,
+        title TEXT,
+        owner_id INTEGER REFERENCES users(id)
+);
+
+CREATE TABLE dialog(
+        id SERIAL PRIMARY KEY,
+        title TEXT,
+        icon TEXT,
+        note TEXT,
+        messenger_id INTEGER REFERENCES messenger(id)
+);
+
+
+CREATE TABLE dialog_to_user(
+        id SERIAL UNIQUE,
+        dialog_id INTEGER REFERENCES dialog(id),
+        user_id INTEGER REFERENCES users(id),
+        PRIMARY KEY (user_id, dialog_id)
+);
+
+
+
+CREATE TABLE favorites(
+        id SERIAL,
+        dialog_to_user_id INTEGER REFERENCES dialog_to_user(id),
+        category_id INTEGER REFERENCES category(id),
+        PRIMARY KEY (category_id, dialog_to_user_id)
+);
+
+
+
+
+
+
+
+
+
 insert into public.user(first_name, last_name) values
 ('Alex', 'Trsv'),
 ('Roman', 'Atikeev'),
@@ -40,3 +79,20 @@ insert into users_messengers(user_id, messenger_id) values
 
 select first_name from public.user where id in (select user_id from users_messengers where messenger_id =
 (select id from messenger where title = 'Vk'));
+
+
+
+CREATE FUNCTION change_position_funck() RETURNS trigger AS $change_position_funck$
+BEGIN
+    UPDATE users_messengers SET position = position + 1 WHERE (position > new.position OR position = new.position) AND user_id = 1  AND messenger_id != new.messenger_id;
+    RETURN new;
+END
+$change_position_funck$ LANGUAGE plpgsql;
+
+CREATE TRIGGER change_position BEFORE UPDATE ON users_messengers FOR EACH ROW WHEN (pg_trigger_depth() = 0)
+    EXECUTE PROCEDURE change_position_funck();
+
+
+
+
+

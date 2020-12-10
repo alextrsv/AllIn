@@ -12,6 +12,8 @@ public class UsersMessengers {
     private int id;
     @Column(name = "access_token")
     private String accessToken;
+    @Column(name = "position")
+    private int position;
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -57,5 +59,13 @@ public class UsersMessengers {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 }

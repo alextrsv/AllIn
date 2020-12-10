@@ -1,8 +1,10 @@
 package alex.controllers;
 
+import alex.entity.Category;
 import alex.entity.Messenger;
 import alex.entity.User;
 import alex.entity.UsersMessengers;
+import alex.service.CategoryService;
 import alex.service.MessengerService;
 import alex.service.UserService;
 import alex.service.UsersMessengersService;
@@ -31,6 +33,8 @@ public class UserController {
     @Autowired
     private UsersMessengersService usersMessengersService;
 
+    @Autowired
+    private CategoryService categoryService;
 
 
     @GetMapping(produces = "application/json")
@@ -39,18 +43,6 @@ public class UserController {
         return userService.getAll();
     }
 
-
-//    @PostMapping("/add")
-//    public String addUser(@RequestHeader("Authorization") String token, @RequestParam("phone") String phone){
-//        User newUser = new User();
-//        newUser.setToken(token);
-//        newUser.setPhone(phone);
-//
-//        userService.addUser(newUser);
-//
-//        return "redirect:/users";
-//
-//    }
 
     @PostMapping("/add")
     public String addUser(@RequestHeader("Authorization") String token, @RequestBody User newUser){
@@ -137,7 +129,6 @@ public class UserController {
     }
 
 
-
     @DeleteMapping("/messengers/{id}/delete")
     public String removeMessenger(@RequestHeader("Authorization") String token,
                                   @PathVariable("id") int messid) {
@@ -147,5 +138,64 @@ public class UserController {
         usersMessengersService.delete(usersMessengers.getId());
 
         return "redirect:/users";
+    }
+
+    @PostMapping("/messengers/{id}/change-pos")
+    @ResponseBody
+    public String changePosition(@RequestHeader("Authorization") String token,
+                                 @PathVariable("id") int messid, @RequestParam("newpos") int newpos){
+
+        UsersMessengers usersMessengers =
+                usersMessengersService.getByUIdMId(userService.getByToken(token).getId(), messid);
+
+        usersMessengers.setPosition(newpos);
+        usersMessengersService.editUsersMessengers(usersMessengers);
+
+        return "position has been changed";
+    }
+
+
+
+    /////////////CATEGORIES
+
+    @GetMapping("/categories")
+    @ResponseBody
+    public Iterable<Category> getUsersCategories(@RequestHeader("Authorization") String token,
+                                                 HttpServletResponse response) {
+
+        User user = userService.getByToken(token);
+        Collection<Category> categories = user.getCategories();
+
+        return categories;
+    }
+
+
+    @PostMapping("/categories/add")
+    @ResponseBody
+    public String createCategory(@RequestHeader("Authorization") String token, @RequestBody Category newCategory){
+
+        User user = userService.getByToken(token);
+        newCategory.setUser(user);
+        user.getCategories().add(newCategory);
+
+        userService.editUser(user);
+
+        return  "successful";
+    }
+
+
+    @DeleteMapping("/categories/{id}/delete")
+    @ResponseBody
+    public String deleteCategory(@RequestHeader("Authorization") String token, @PathVariable("id") int categoryId){
+
+        User user = userService.getByToken(token);
+        Category category = categoryService.getById(categoryId);
+        if(user.getCategories().contains(category)){
+            user.getCategories().remove(category);
+            categoryService.delete(categoryId);
+            userService.editUser(user);
+            return "ok";
+        }
+        else return "trouble";
     }
 }
