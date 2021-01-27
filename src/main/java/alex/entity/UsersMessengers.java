@@ -12,6 +12,7 @@ public class UsersMessengers {
     private int id;
     @Column(name = "access_token")
     private String accessToken;
+
     @Column(name = "position")
     private int position;
 

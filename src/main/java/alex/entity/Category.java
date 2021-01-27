@@ -4,6 +4,7 @@ package alex.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
 @Table(name = "category")
@@ -16,9 +17,12 @@ public class Category {
     private String title;
 
     @JsonIgnore
-    @ManyToOne(optional = false)
+    @ManyToOne()
     @JoinColumn(name = "owner_id")
     private User user;
+
+    @OneToMany(mappedBy = "category")
+    private Collection<Favorites> favorites;
 
 
 

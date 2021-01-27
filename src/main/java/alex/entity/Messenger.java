@@ -17,11 +17,14 @@ public class Messenger {
     @Column(name = "icon")
     private String icon;
 
-///////////////////////////////////////////////////////////////////////////
     @JsonIgnore
-    @OneToMany(mappedBy = "messenger", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "messenger")
     private Collection<UsersMessengers> usMes;
-///////////////////////////////////////////////////////////////////////////
+
+
+    //в каждом мессенджере множество диалогов
+    @OneToMany(mappedBy = "messenger")
+    private Collection<Dialog> dialogs;
 
 
     @Transient

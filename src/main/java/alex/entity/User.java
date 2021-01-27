@@ -23,10 +23,14 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Collection<Category> categories;
-    ///////////////////////////////////////////////////////////////////////////
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<UsersMessengers> usMes;
-///////////////////////////////////////////////////////////////////////////
+
+    //реализация связи М:М (диалоги - пользователи)
+    @OneToMany(mappedBy = "user")
+    private Collection<DialogToUser> dialogToUserCollection;
+
 
     public User() {
     }
