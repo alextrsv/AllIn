@@ -42,4 +42,7 @@ public class Category {
         this.id = id;
     }
 
+    public int getId() {
+        return id;
+    }
 }

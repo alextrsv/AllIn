@@ -1,5 +1,6 @@
 package alex.controllers;
 
+import alex.dto.DTOMessenger;
 import alex.entity.Category;
 import alex.entity.Messenger;
 import alex.entity.User;
@@ -44,13 +45,24 @@ public class UserController {
     }
 
 
-    @PostMapping("/add")
-    public String addUser(@RequestHeader("Authorization") String token, @RequestBody User newUser){
-        newUser.setToken(token);
-        userService.addUser(newUser);
-        return "redirect:/users";
-
+    @PostMapping("/auth")
+    @ResponseBody
+    public User addUser(@RequestHeader("Authorization") String token, @RequestBody User newUser){
+        if (userService.getByToken(token) == null) {
+            //пользователя нет, создается новый
+            newUser.setToken(token);
+            userService.addUser(newUser);
+            return newUser;
+        }
+        else return userService.getByToken(token);
     }
+
+    @PostMapping("/downloadProfile")
+    @ResponseBody
+    public User downloadProfile(@RequestHeader("Authorization") String token){
+            return userService.getByToken(token);
+        }
+
 
     @DeleteMapping("/delete")
     public String removeUser(@RequestHeader("Authorization") String token){
@@ -104,7 +116,7 @@ public class UserController {
 
     @PostMapping("/messengers/add")
     public String addMessenger(@RequestHeader("Authorization") String token, @RequestHeader("accessToken") String accessToken,
-                               @RequestBody Messenger mess) {
+                               @RequestBody DTOMessenger mess) {
 
         try {
 
@@ -112,9 +124,12 @@ public class UserController {
             Messenger messenger = messengerService.getById(mess.getId());
             UsersMessengers newUsersMessengers = new UsersMessengers();
 
+            System.out.println("SIZEEEEE"+user.getUsMes().size()+"\n\n\n\n");
+
             newUsersMessengers.setUser(user);
             newUsersMessengers.setMessenger(messenger);
             newUsersMessengers.setAccessToken(accessToken);
+            newUsersMessengers.setPosition(user.getUsMes().size()+1);
 
             usersMessengersService.editUsersMessengers(newUsersMessengers);
         }catch (RuntimeException e) {
@@ -129,31 +144,34 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/messengers/{id}/delete")
+    @PostMapping("/messengers/delete")
     public String removeMessenger(@RequestHeader("Authorization") String token,
-                                  @PathVariable("id") int messid) {
+                                  @RequestBody List<Messenger> messengersList) {
 
         User user = userService.getByToken(token);
-        UsersMessengers usersMessengers = usersMessengersService.getByUIdMId(user.getId(), messid);
-        usersMessengersService.delete(usersMessengers.getId());
+        for (Messenger mess: messengersList) {
+            UsersMessengers usersMessengers = usersMessengersService.getByUIdMId(user.getId(), mess.getId());
+            usersMessengersService.delete(usersMessengers.getId());
+        }
 
         return "redirect:/users";
     }
 
-    @PostMapping("/messengers/{id}/change-pos")
+    /////////////////////////PART_________2
+
+    @PostMapping("/messengers/change-pos")
     @ResponseBody
     public String changePosition(@RequestHeader("Authorization") String token,
-                                 @PathVariable("id") int messid, @RequestParam("newpos") int newpos){
+                                 @RequestBody DTOMessenger infMessenger){
 
         UsersMessengers usersMessengers =
-                usersMessengersService.getByUIdMId(userService.getByToken(token).getId(), messid);
+                usersMessengersService.getByUIdMId(userService.getByToken(token).getId(), infMessenger.getId());
 
-        usersMessengers.setPosition(newpos);
+        usersMessengers.setPosition(infMessenger.getPosition());
         usersMessengersService.editUsersMessengers(usersMessengers);
 
         return "position has been changed";
     }
-
 
 
     /////////////CATEGORIES
@@ -172,15 +190,15 @@ public class UserController {
 
     @PostMapping("/categories/add")
     @ResponseBody
-    public String createCategory(@RequestHeader("Authorization") String token, @RequestBody Category newCategory){
+    public Category createCategory(@RequestHeader("Authorization") String token,
+                                   @RequestBody Category dtoCategory){
 
         User user = userService.getByToken(token);
-        newCategory.setUser(user);
-        user.getCategories().add(newCategory);
-
+        dtoCategory.setUser(user);
+        user.getCategories().add(dtoCategory);
         userService.editUser(user);
-
-        return  "successful";
+        
+        return categoryService.findByTitle(dtoCategory.getTitle());
     }
 
 
@@ -198,4 +216,17 @@ public class UserController {
         }
         else return "trouble";
     }
+
+
+    @PostMapping("/categories/update")
+    @ResponseBody
+    public Category updateCategory(@RequestHeader("Authorization") String token, @RequestBody Category infCategory){
+
+          Category updCategory = categoryService.getById(infCategory.getId());
+          updCategory.setTitle(infCategory.getTitle());
+          categoryService.editCategory(updCategory);
+
+        return  updCategory;
+    }
+
 }
