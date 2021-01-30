@@ -4,9 +4,11 @@ import alex.entity.DialogToUser;
 import alex.repository.DialogToUserRepository;
 import alex.service.DialogToUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class DialogToUserServiceImpl implements DialogToUserService {
     @Autowired
     DialogToUserRepository dialogToUserRepository;

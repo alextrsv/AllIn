@@ -28,7 +28,7 @@ public class Dialog {
 
 
     //реализация связи М:М (диалоги - пользователи)
-    @OneToMany(mappedBy = "messenger")
+    @OneToMany(mappedBy = "dialog")
     private Collection<DialogToUser> dialogToUserCollection;
 
 

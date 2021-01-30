@@ -21,6 +21,7 @@ public class DialogToUser {
     @JoinColumn(name = "user_id")
     private User user;
 
+
     @OneToMany(mappedBy = "dialogToUser")
     private Collection<Favorites> favorites;
 
