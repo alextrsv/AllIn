@@ -22,10 +22,17 @@ public class DialogToUser {
     private User user;
 
 
-    @OneToMany(mappedBy = "dialogToUser")
+    @OneToMany(mappedBy = "dialogToUser",fetch = FetchType.EAGER)
     private Collection<Favorites> favorites;
 
 
+    public Collection<Favorites> getFavorites() {
+        return favorites;
+    }
+
+    public void setFavorites(Collection<Favorites> favorites) {
+        this.favorites = favorites;
+    }
 
     public int getId() {
         return id;

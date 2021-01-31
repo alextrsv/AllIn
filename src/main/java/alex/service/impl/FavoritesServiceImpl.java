@@ -28,4 +28,14 @@ public class FavoritesServiceImpl implements FavoritesService {
     public List<Favorites> getAll() {
         return (List<Favorites>) favoritesRepository.findAll();
     }
+
+    @Override
+    public void deleteByDialogToUserId(int dialogToUserId) {
+        favoritesRepository.deleteByDialogToUserId(dialogToUserId);
+    }
+
+    @Override
+    public void deleteBy2Id(int dialogToUserId, int categoryId) {
+        favoritesRepository.deleteBy2Id(dialogToUserId, categoryId);
+    }
 }
