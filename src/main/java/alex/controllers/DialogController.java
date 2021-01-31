@@ -170,14 +170,6 @@ public class DialogController {
         return dialogs;
     }
 
-//    @GetMapping("/dialogCat")
-//    @ResponseBody
-//    private DialogCategoryHolder getEx(){
-//        DialogCategoryHolder dialogCategoryHolder = new DialogCategoryHolder();
-//        dialogCategoryHolder.setDialog(dialogService.getById(4));
-//        dialogCategoryHolder.setCategory(categoryService.getById(2));
-//
-//        return  dialogCategoryHolder;
-//    }
 }
+
 
