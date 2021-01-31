@@ -36,7 +36,7 @@ public class DialogController {
     private Dialog getDialog(@PathVariable(name = "id") int id){
         return dialogService.getById(id);
     }
-
+ 
 
     /*
     todo:
