@@ -1,6 +1,6 @@
 package alex.controllers;
 
-import alex.dto.DTOMessenger;
+import alex.dto.MessengerDto;
 import alex.entity.Category;
 import alex.entity.Messenger;
 import alex.entity.User;
@@ -116,7 +116,7 @@ public class UserController {
 
     @PostMapping("/messengers/add")
     public String addMessenger(@RequestHeader("Authorization") String token, @RequestHeader("accessToken") String accessToken,
-                               @RequestBody DTOMessenger mess) {
+                               @RequestBody MessengerDto mess) {
 
         try {
 
@@ -162,7 +162,7 @@ public class UserController {
     @PostMapping("/messengers/change-pos")
     @ResponseBody
     public String changePosition(@RequestHeader("Authorization") String token,
-                                 @RequestBody DTOMessenger infMessenger){
+                                 @RequestBody MessengerDto infMessenger){
 
         UsersMessengers usersMessengers =
                 usersMessengersService.getByUIdMId(userService.getByToken(token).getId(), infMessenger.getId());

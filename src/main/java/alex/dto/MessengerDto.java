@@ -2,7 +2,7 @@ package alex.dto;
 
 import alex.entity.Messenger;
 
-public class DTOMessenger extends Messenger {
+public class MessengerDto extends Messenger {
     int position;
 
     public int getPosition() {

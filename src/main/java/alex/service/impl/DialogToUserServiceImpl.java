@@ -27,4 +27,9 @@ public class DialogToUserServiceImpl implements DialogToUserService {
     public List<DialogToUser> getAll() {
         return (List<DialogToUser>) dialogToUserRepository.findAll();
     }
+
+    @Override
+    public DialogToUser getByDidUid(int dialogId, int userId) {
+        return dialogToUserRepository.findByDidUid(dialogId, userId);
+    }
 }

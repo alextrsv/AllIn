@@ -17,5 +17,27 @@ public class Favorites {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public DialogToUser getDialogToUser() {
+        return dialogToUser;
+    }
+
+    public void setDialogToUser(DialogToUser dialogToUser) {
+        this.dialogToUser = dialogToUser;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 }

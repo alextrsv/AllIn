@@ -4,9 +4,11 @@ import alex.entity.Favorites;
 import alex.repository.FavoritesRepository;
 import alex.service.FavoritesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class FavoritesServiceImpl implements FavoritesService {
 
     @Autowired

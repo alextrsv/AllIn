@@ -8,4 +8,5 @@ public interface DialogToUserService {
     DialogToUser getById(int id);
     DialogToUser edit(DialogToUser dialogToUser);
     List<DialogToUser> getAll();
+    DialogToUser getByDidUid(int dialogId, int userId);
 }
