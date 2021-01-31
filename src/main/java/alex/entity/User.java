@@ -42,6 +42,13 @@ public class User {
         this.phone = phone;
     }
 
+    public Collection<DialogToUser> getDialogToUserCollection() {
+        return dialogToUserCollection;
+    }
+
+    public void setDialogToUserCollection(Collection<DialogToUser> dialogToUserCollection) {
+        this.dialogToUserCollection = dialogToUserCollection;
+    }
 
     public Collection<UsersMessengers> getUsMes() {
         return usMes;

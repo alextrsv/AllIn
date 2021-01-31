@@ -42,7 +42,7 @@ public class DialogController {
     todo:
           + 1. Создать новый диалог пользователем
           + 2. Добавить диалог в категорию
-          3. Удалить диалог из избранного(из категории)
+          + 3. Удалить диалог из избранного(из категории)
           4. Получить все диалоги из категории пользователя
     */
 
@@ -86,11 +86,9 @@ public class DialogController {
     private String addDialogsToCategories(@RequestHeader("Authorization") String token,
                                        @RequestBody DialogCategoryHolder dialogCategoryHolder){
 
-        List<Dialog> dialogs = new ArrayList<Dialog>();
-        List<Category> categories = new ArrayList<Category>();
+        List<Dialog> dialogs = dialogCategoryHolder.getDialogs();
+        List<Category> categories = dialogCategoryHolder.getCategories();
 
-        dialogs = dialogCategoryHolder.getDialogs();
-        categories = dialogCategoryHolder.getCategories();
 
         User user = userService.getByToken(token);
 
@@ -112,6 +110,65 @@ public class DialogController {
         return "OK";
     }
 
+    @PostMapping("/favorites/dialogs/delete")
+    @ResponseBody
+    private String deleteFromCategories(@RequestHeader("Authorization") String token,
+                                        @RequestHeader("deleteFromFavourites") boolean deleteFromFavourites,
+                                        @RequestBody DialogCategoryHolder dialogCategoryHolder){
+
+        List<Dialog> dialogs = dialogCategoryHolder.getDialogs();
+        User user = userService.getByToken(token);
+        List<DialogToUser> dialogsToUserToDelete = new ArrayList<DialogToUser>();
+        for (Dialog dg : dialogs) {
+            dialogsToUserToDelete.add(dialogToUserService.getByDidUid(dg.getId(), user.getId()));
+        }
+
+        if(deleteFromFavourites) {
+            for (DialogToUser dialogToUserToDelete : dialogsToUserToDelete)
+                favoritesService.deleteByDialogToUserId(dialogToUserToDelete.getId());
+        }
+        else{
+            List<Category> categories = dialogCategoryHolder.getCategories();
+            for (DialogToUser dialogToUserToDelete: dialogsToUserToDelete) {
+                for (Category category: categories) {
+                    favoritesService.deleteBy2Id(dialogToUserToDelete.getId(), category.getId());
+                }
+            }
+        }
+
+        return "Ok";
+    }
+
+
+    @PostMapping("/getFavorites")
+    @ResponseBody
+    private List<Dialog> getFavDialogs(@RequestHeader("Authorization") String token,
+                                 @RequestBody Category categoryTr){
+
+        User user = userService.getByToken(token);
+        List<DialogToUser> dialogToUserList = (List<DialogToUser>) user.getDialogToUserCollection();
+        List<Dialog> dialogs = new ArrayList<Dialog>();
+
+        if(categoryTr.getId() != 0){
+            Category category = categoryService.getById(categoryTr.getId());
+            for (DialogToUser dialogToUser: dialogToUserList) {
+                if(dialogToUser.getFavorites().size() != 0) {
+                    for (Favorites fav :dialogToUser.getFavorites()) {
+                        if(fav.getCategory().getId() == category.getId()) {
+                            dialogs.add(dialogToUser.getDialog());
+                            break;
+                        }
+                    }
+                }
+            }
+        }else{
+            for (DialogToUser dialogToUser: dialogToUserList) {
+                if(dialogToUser.getFavorites().size() != 0) dialogs.add(dialogToUser.getDialog());
+            }
+        }
+
+        return dialogs;
+    }
 
 //    @GetMapping("/dialogCat")
 //    @ResponseBody
