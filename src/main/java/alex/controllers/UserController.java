@@ -215,7 +215,7 @@ public class UserController {
             userService.editUser(user);
             return new Response(ResponseStatus.SUCCESS, "category has been deleted");
         }
-        else return new Response(ResponseStatus.ERROR, "current user doesn't have such category");
+         else return new Response(ResponseStatus.ERROR, "current user doesn't have such category");
     }
 
 

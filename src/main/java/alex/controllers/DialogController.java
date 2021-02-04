@@ -159,7 +159,7 @@ public class DialogController {
             for (DialogToUser dialogToUser: dialogToUserList) {
                 if(dialogToUser.getFavorites().size() != 0) {
                     for (Favorites fav :dialogToUser.getFavorites()) {
-                        if(fav.getCategory().getId() == category.getId()) {
+                        if(fav.getCategory().getId() == category.getId()){
                             dialogs.add(dialogToUser.getDialog());
                             break;
                         }
