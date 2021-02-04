@@ -1,6 +1,8 @@
 package alex.controllers;
 
 import alex.dto.MessengerDto;
+import alex.dto.Response;
+import alex.dto.ResponseStatus;
 import alex.entity.Category;
 import alex.entity.Messenger;
 import alex.entity.User;
@@ -60,8 +62,8 @@ public class UserController {
     @PostMapping("/downloadProfile")
     @ResponseBody
     public User downloadProfile(@RequestHeader("Authorization") String token){
-            return userService.getByToken(token);
-        }
+        return userService.getByToken(token);
+    }
 
 
     @DeleteMapping("/delete")
@@ -73,16 +75,15 @@ public class UserController {
 
     @GetMapping("/no-user-error")
     @ResponseBody
-    public String noUserError(){
-        return "there is no such user";
+    public Response noUserError(){
+        return new Response(ResponseStatus.ERROR, "there is no such user");
     }
 
     @GetMapping("/messenger-already-exists-error")
     @ResponseBody
-    public String messengerAlreadyExists(){
-        return "this user already has this messenger";
+    public Response messengerAlreadyExists(){
+        return new Response(ResponseStatus.ERROR, "this user already has this messenger");
     }
-
 
 
     @GetMapping(value = "/messengers")
@@ -161,7 +162,7 @@ public class UserController {
 
     @PostMapping("/messengers/change-pos")
     @ResponseBody
-    public String changePosition(@RequestHeader("Authorization") String token,
+    public Response changePosition(@RequestHeader("Authorization") String token,
                                  @RequestBody MessengerDto infMessenger){
 
         UsersMessengers usersMessengers =
@@ -170,7 +171,7 @@ public class UserController {
         usersMessengers.setPosition(infMessenger.getPosition());
         usersMessengersService.editUsersMessengers(usersMessengers);
 
-        return "position has been changed";
+        return new Response(ResponseStatus.SUCCESS, "position has been changed");
     }
 
 
@@ -197,14 +198,14 @@ public class UserController {
         dtoCategory.setUser(user);
         user.getCategories().add(dtoCategory);
         userService.editUser(user);
-        
+
         return categoryService.findByTitle(dtoCategory.getTitle());
     }
 
 
     @DeleteMapping("/categories/{id}/delete")
     @ResponseBody
-    public String deleteCategory(@RequestHeader("Authorization") String token, @PathVariable("id") int categoryId){
+    public Response deleteCategory(@RequestHeader("Authorization") String token, @PathVariable("id") int categoryId){
 
         User user = userService.getByToken(token);
         Category category = categoryService.getById(categoryId);
@@ -212,9 +213,9 @@ public class UserController {
             user.getCategories().remove(category);
             categoryService.delete(categoryId);
             userService.editUser(user);
-            return "ok";
+            return new Response(ResponseStatus.SUCCESS, "category has been deleted");
         }
-        else return "trouble";
+        else return new Response(ResponseStatus.ERROR, "current user doesn't have such category");
     }
 
 
@@ -222,11 +223,20 @@ public class UserController {
     @ResponseBody
     public Category updateCategory(@RequestHeader("Authorization") String token, @RequestBody Category infCategory){
 
-          Category updCategory = categoryService.getById(infCategory.getId());
-          updCategory.setTitle(infCategory.getTitle());
-          categoryService.editCategory(updCategory);
+        Category updCategory = categoryService.getById(infCategory.getId());
+        updCategory.setTitle(infCategory.getTitle());
+        categoryService.editCategory(updCategory);
 
         return  updCategory;
     }
 
+
+    @GetMapping("/status")
+    @ResponseBody
+    private Response getStatus(){
+     Response response = new Response();
+     response.setStatus(ResponseStatus.SUCCESS);
+     response.setComment("действие было сделано");
+        return response;
+    }
 }

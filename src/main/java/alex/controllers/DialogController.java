@@ -1,6 +1,8 @@
 package alex.controllers;
 
 import alex.dto.DialogCategoryHolder;
+import alex.dto.Response;
+import alex.dto.ResponseStatus;
 import alex.entity.*;
 import alex.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +45,13 @@ public class DialogController {
           + 1. Создать новый диалог пользователем
           + 2. Добавить диалог в категорию
           + 3. Удалить диалог из избранного(из категории)
-          4. Получить все диалоги из категории пользователя
+          + 4. Получить все диалоги из категории пользователя
     */
 
 
     @PostMapping("dialog/add/{id}")
     @ResponseBody
-    private String createNewDialog(@PathVariable("id") int messId, @RequestHeader("Authorization") String token){
+    private Response createNewDialog(@PathVariable("id") int messId, @RequestHeader("Authorization") String token){
 
         User user = userService.getByToken(token);
 
@@ -60,7 +62,7 @@ public class DialogController {
         Messenger currentMessenger = messengerService.getById(messId);
 
         if(!messengersOfUser.contains(currentMessenger))
-            return "This user do not have such messenger";
+            return new Response(ResponseStatus.ERROR, "This user do not have such messenger");
         else {
 
             Dialog dialog = new Dialog();
@@ -76,14 +78,15 @@ public class DialogController {
 
             dialogService.edit(dialog);
             dialogToUserService.edit(dialogToUser);
-            return "OK";
+            return new Response(ResponseStatus.SUCCESS, "New dialog has been created");
+
         }
     }
 
 
     @PostMapping("/dialogsToCategories")
     @ResponseBody
-    private String addDialogsToCategories(@RequestHeader("Authorization") String token,
+    private Response addDialogsToCategories(@RequestHeader("Authorization") String token,
                                        @RequestBody DialogCategoryHolder dialogCategoryHolder){
 
         List<Dialog> dialogs = dialogCategoryHolder.getDialogs();
@@ -95,10 +98,12 @@ public class DialogController {
         for (Dialog dg: dialogs) {
             Dialog dialog = dialogService.getById(dg.getId());
             DialogToUser dialogToUser = dialogToUserService.getByDidUid(dialog.getId(), user.getId());
-            if(dialogToUser == null) return "у пользователя нет диалога c id = " + dialog.getId();
+            if(dialogToUser == null)
+                return new Response(ResponseStatus.ERROR, "у пользователя нет диалога c id = " + dialog.getId());
             for (Category ct : categories) {
                 Category category = categoryService.getById(ct.getId());
-                if(category.getUser().getId() != user.getId()) return "у пользователя нет категории c id = " + category.getId();
+                if(category.getUser().getId() != user.getId())
+                    return new Response(ResponseStatus.ERROR,"у пользователя нет категории c id = " + category.getId());
                 Favorites favorites = new Favorites();
 
                 favorites.setDialogToUser(dialogToUser);
@@ -107,12 +112,12 @@ public class DialogController {
                 favoritesService.edit(favorites);
             }
         }
-        return "OK";
+        return new Response(ResponseStatus.SUCCESS, "all dialogs have been added to all categories");
     }
 
     @PostMapping("/favorites/dialogs/delete")
     @ResponseBody
-    private String deleteFromCategories(@RequestHeader("Authorization") String token,
+    private Response deleteFromCategories(@RequestHeader("Authorization") String token,
                                         @RequestHeader("deleteFromFavourites") boolean deleteFromFavourites,
                                         @RequestBody DialogCategoryHolder dialogCategoryHolder){
 
@@ -136,7 +141,7 @@ public class DialogController {
             }
         }
 
-        return "Ok";
+        return new Response(ResponseStatus.SUCCESS, "dialogs have been deleted from categories");
     }
 
 
