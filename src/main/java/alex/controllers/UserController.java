@@ -158,6 +158,23 @@ public class UserController {
         return "redirect:/users";
     }
 
+
+    @PostMapping("/msg-token")
+    @ResponseBody
+    private Response setMsgToken(@RequestHeader("Authorization") String token,
+                                 @RequestHeader(name = "msgToken") String msgToken){
+
+        try {
+            User user = userService.getByToken(token);
+            user.setMsgToken(msgToken);
+            userService.editUser(user);
+        }catch (java.lang.NullPointerException exeption){
+            return new Response(ResponseStatus.ERROR, "there isn't such user. Check auth token");
+        }
+        return new Response(ResponseStatus.SUCCESS, "msgToken has been set successfully set up");
+    }
+
+
     /////////////////////////PART_________2
 
     @PostMapping("/messengers/change-pos")
@@ -239,4 +256,5 @@ public class UserController {
      response.setComment("действие было сделано");
         return response;
     }
+
 }

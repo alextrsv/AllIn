@@ -19,6 +19,9 @@ public class User {
     private String token;
     @Column(name = "phone")
     private String phone;
+    @Column(name = "msg_token")
+    private String msgToken;
+
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -56,6 +59,14 @@ public class User {
 
     public void setUsMes(Collection<UsersMessengers> usMes) {
         this.usMes = usMes;
+    }
+
+    public String getMsgToken() {
+        return msgToken;
+    }
+
+    public void setMsgToken(String msgToken) {
+        this.msgToken = msgToken;
     }
 
     public String getPhone() {
