@@ -147,7 +147,7 @@ public class DialogController {
 
     @PostMapping("/getFavorites")
     @ResponseBody
-    private List<Dialog> getFavDialogs(@RequestHeader("Authorization") String token,
+    private List<Dialog>  getFavDialogs(@RequestHeader("Authorization") String token,
                                  @RequestBody Category categoryTr){
 
         User user = userService.getByToken(token);

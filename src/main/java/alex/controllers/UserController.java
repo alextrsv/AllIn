@@ -171,6 +171,7 @@ public class UserController {
         }catch (java.lang.NullPointerException exeption){
             return new Response(ResponseStatus.ERROR, "there isn't such user. Check auth token");
         }
+
         return new Response(ResponseStatus.SUCCESS, "msgToken has been set successfully set up");
     }
 

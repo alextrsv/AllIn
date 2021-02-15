@@ -21,6 +21,7 @@ public class MessengerController {
     @ResponseBody
     public List<Messenger> allUsers(Model model) {
         List<Messenger> messengers = messengerService.getAll();
+
         return messengers;
     }
 }
