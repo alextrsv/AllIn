@@ -51,6 +51,7 @@ public class UserController {
     @ResponseBody
     public User addUser(@RequestHeader("Authorization") String token, @RequestBody User newUser){
         if (userService.getByToken(token) == null) {
+
             //пользователя нет, создается новый
             newUser.setToken(token);
             userService.addUser(newUser);

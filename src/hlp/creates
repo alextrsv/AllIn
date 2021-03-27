@@ -1,0 +1,56 @@
+create table users(
+    id serial primary key,
+    token text UNIQUE,
+    first_name text,
+    last_name text,
+    phone TEXT,
+    msg_token text
+);
+
+create table messenger(
+    id serial primary key,
+    title text,
+    icon text
+);
+
+create table users_messengers(
+     id SERIAL,
+    user_id integer references users (id),
+    messenger_id integer references messenger (id),
+    access_token text,
+    position INTEGER,
+    PRIMARY KEY(user_id, messenger_id)
+);
+
+
+
+CREATE TABLE category(
+        id SERIAL PRIMARY KEY,
+        title TEXT,
+        owner_id INTEGER REFERENCES users(id)
+);
+
+CREATE TABLE dialog(
+        id SERIAL PRIMARY KEY,
+        title TEXT,
+        icon TEXT,
+        note TEXT,
+        messenger_id INTEGER REFERENCES messenger(id)
+);
+
+
+CREATE TABLE dialog_to_user(
+        id SERIAL UNIQUE,
+        dialog_id INTEGER REFERENCES dialog(id),
+        user_id INTEGER REFERENCES users(id),
+        PRIMARY KEY (user_id, dialog_id)
+);
+
+
+
+CREATE TABLE favorites(
+        id SERIAL,
+        dialog_to_user_id INTEGER REFERENCES dialog_to_user(id),
+        category_id INTEGER REFERENCES category(id),
+        PRIMARY KEY (category_id, dialog_to_user_id)
+);

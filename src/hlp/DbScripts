@@ -2,7 +2,9 @@ create table users(
     id serial primary key,
     token text,
     first_name text,
-    last_name text
+    last_name text,
+    phone text,
+    msg_token text
 );
 
 create table messenger(
@@ -15,7 +17,8 @@ create table users_messengers(
     id serial primary key,
     user_id integer references users (id),
     messenger_id integer references messenger (id),
-    access_token text
+    access_token text,
+    position INTEGER
 );
 
 
@@ -56,9 +59,6 @@ CREATE TABLE favorites(
 
 
 
-
-
-
 insert into public.user(first_name, last_name) values
 ('Alex', 'Trsv'),
 ('Roman', 'Atikeev'),
@@ -82,17 +82,18 @@ select first_name from public.user where id in (select user_id from users_messen
 
 
 
-CREATE FUNCTION change_position_funck() RETURNS trigger AS $change_position_funck$
+create function change_position_funck() returns trigger as $change_position_funck$
 BEGIN
-    UPDATE users_messengers SET position = position + 1 WHERE (position > new.position OR position = new.position) AND user_id = 1  AND messenger_id != new.messenger_id;
-    RETURN new;
+    IF new.position < old.position THEN
+        UPDATE users_messengers SET position = position + 1 WHERE (position > new.position OR position = new.position) AND user_id = old.user_id  AND messenger_id != new.messenger_id;
+        RETURN new;
+    ELSEIF new.position > old.position THEN
+        UPDATE users_messengers SET position = position - 1 WHERE (position < new.position OR position = new.position) AND user_id = old.user_id  AND messenger_id != new.messenger_id;
+        RETURN new;
+    end if;
 END
 $change_position_funck$ LANGUAGE plpgsql;
 
+
 CREATE TRIGGER change_position BEFORE UPDATE ON users_messengers FOR EACH ROW WHEN (pg_trigger_depth() = 0)
-    EXECUTE PROCEDURE change_position_funck();
-
-
-
-
-
+EXECUTE PROCEDURE change_position_funck();
