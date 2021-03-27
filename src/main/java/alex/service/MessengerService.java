@@ -1,16 +1,18 @@
 package alex.service;
 
 
+import alex.dto.MessengerDto;
+import alex.dto.Response;
 import alex.entity.Messenger;
 
 import java.util.List;
 
 public interface MessengerService {
-    Messenger addMessenger(Messenger messenger);
-    void delete(int id);
-    Messenger getByName(String name);
-    Messenger editMessenger(Messenger messenger);
-    List<Messenger> getAll();
 
+
+    Response changePosition(String token, MessengerDto messenger);
+    void removeMessenger(String token, List<Messenger> messengersToDelete);
+    void delete(int id);
+    Iterable<Messenger> getAll();
     Messenger getById(int messId);
 }

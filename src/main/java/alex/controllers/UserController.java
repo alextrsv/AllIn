@@ -7,10 +7,13 @@ import alex.entity.Category;
 import alex.entity.Messenger;
 import alex.entity.User;
 import alex.entity.UsersMessengers;
+import alex.repository.UserRepository;
+import alex.repository.UsersMessengersRepository;
 import alex.service.CategoryService;
 import alex.service.MessengerService;
 import alex.service.UserService;
 import alex.service.UsersMessengersService;
+import com.google.j2objc.annotations.AutoreleasePool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -34,15 +37,13 @@ public class UserController {
     private MessengerService messengerService;
 
     @Autowired
-    private UsersMessengersService usersMessengersService;
-
-    @Autowired
     private CategoryService categoryService;
+
 
 
     @GetMapping(produces = "application/json")
     @ResponseBody
-    public List<User> allUsers() {
+    public Iterable<User> allUsers() {
         return userService.getAll();
     }
 
@@ -50,14 +51,7 @@ public class UserController {
     @PostMapping("/auth")
     @ResponseBody
     public User addUser(@RequestHeader("Authorization") String token, @RequestBody User newUser){
-        if (userService.getByToken(token) == null) {
-
-            //пользователя нет, создается новый
-            newUser.setToken(token);
-            userService.addUser(newUser);
-            return newUser;
-        }
-        else return userService.getByToken(token);
+        return userService.addUser(token, newUser);
     }
 
     @PostMapping("/downloadProfile")
@@ -69,9 +63,7 @@ public class UserController {
 
     @DeleteMapping("/delete")
     public String removeUser(@RequestHeader("Authorization") String token){
-        usersMessengersService.deleteByUserId(userService.getByToken(token).getId());
-        userService.delete(token);
-        return "redirect:/users";
+        return userService.delete(token);
     }
 
     @GetMapping("/no-user-error")
@@ -89,23 +81,10 @@ public class UserController {
 
     @GetMapping(value = "/messengers")
     @ResponseBody
-    public Iterable<Messenger> userMess(@RequestHeader("Authorization") String token, HttpServletResponse response) {
+    public Iterable<Messenger> getUsersMess(@RequestHeader("Authorization") String token, HttpServletResponse response) {
         try {
-            User user = userService.getByToken(token);
-            Collection<UsersMessengers> usersMessengersCollection = user.getUsMes();// коллекция свзяей
-            Collection<Messenger> usrMessengers = new ArrayList<>();//пустая коллекция для мессенджеров
-
-            for (UsersMessengers usMes : usersMessengersCollection) {//заполнение коллекции мессенджеров из коллекции связей
-                usrMessengers.add(usMes.getMessenger());
-            }
-
-            Iterable<Messenger> allMessengers = messengerService.getAll();
-            for (Messenger mess : allMessengers) {
-                mess.setActivated(usrMessengers.contains(mess));
-            }
-            return allMessengers;
+            return userService.getUsersMess(token);
         }catch (java.lang.NullPointerException nullPointerException){
-
             try {
                 response.sendRedirect("/users/no-user-error");
             } catch (IOException e) {
@@ -117,23 +96,9 @@ public class UserController {
 
 
     @PostMapping("/messengers/add")
-    public String addMessenger(@RequestHeader("Authorization") String token, @RequestHeader("accessToken") String accessToken,
-                               @RequestBody MessengerDto mess) {
-
+    public String addMessenger(@RequestHeader("Authorization") String token, @RequestHeader("accessToken") String accessToken, @RequestBody MessengerDto mess) {
         try {
-
-            User user = userService.getByToken(token);
-            Messenger messenger = messengerService.getById(mess.getId());
-            UsersMessengers newUsersMessengers = new UsersMessengers();
-
-            System.out.println("SIZEEEEE"+user.getUsMes().size()+"\n\n\n\n");
-
-            newUsersMessengers.setUser(user);
-            newUsersMessengers.setMessenger(messenger);
-            newUsersMessengers.setAccessToken(accessToken);
-            newUsersMessengers.setPosition(user.getUsMes().size()+1);
-
-            usersMessengersService.editUsersMessengers(newUsersMessengers);
+           userService.addMessenger(token, accessToken, mess);
         }catch (RuntimeException e) {
             Throwable rootCause = com.google.common.base.Throwables.getRootCause(e);
             if (rootCause instanceof SQLException) {
@@ -145,17 +110,10 @@ public class UserController {
         return "redirect:/users";
     }
 
-
     @PostMapping("/messengers/delete")
     public String removeMessenger(@RequestHeader("Authorization") String token,
                                   @RequestBody List<Messenger> messengersList) {
-
-        User user = userService.getByToken(token);
-        for (Messenger mess: messengersList) {
-            UsersMessengers usersMessengers = usersMessengersService.getByUIdMId(user.getId(), mess.getId());
-            usersMessengersService.delete(usersMessengers.getId());
-        }
-
+        messengerService.removeMessenger(token, messengersList);
         return "redirect:/users";
     }
 
@@ -165,17 +123,8 @@ public class UserController {
     private Response setMsgToken(@RequestHeader("Authorization") String token,
                                  @RequestHeader(name = "msgToken") String msgToken){
 
-        try {
-            User user = userService.getByToken(token);
-            user.setMsgToken(msgToken);
-            userService.editUser(user);
-        }catch (java.lang.NullPointerException exeption){
-            return new Response(ResponseStatus.ERROR, "there isn't such user. Check auth token");
-        }
-
-        return new Response(ResponseStatus.SUCCESS, "msgToken has been set successfully set up");
+        return userService.setMsgToken(token, msgToken);
     }
-
 
     /////////////////////////PART_________2
 
@@ -184,15 +133,8 @@ public class UserController {
     public Response changePosition(@RequestHeader("Authorization") String token,
                                  @RequestBody MessengerDto infMessenger){
 
-        UsersMessengers usersMessengers =
-                usersMessengersService.getByUIdMId(userService.getByToken(token).getId(), infMessenger.getId());
-
-        usersMessengers.setPosition(infMessenger.getPosition());
-        usersMessengersService.editUsersMessengers(usersMessengers);
-
-        return new Response(ResponseStatus.SUCCESS, "position has been changed");
+        return messengerService.changePosition(token, infMessenger);
     }
-
 
     /////////////CATEGORIES
 
@@ -201,52 +143,29 @@ public class UserController {
     public Iterable<Category> getUsersCategories(@RequestHeader("Authorization") String token,
                                                  HttpServletResponse response) {
 
-        User user = userService.getByToken(token);
-        Collection<Category> categories = user.getCategories();
+        return userService.getByToken(token).getCategories();
 
-        return categories;
     }
-
 
     @PostMapping("/categories/add")
     @ResponseBody
     public Category createCategory(@RequestHeader("Authorization") String token,
                                    @RequestBody Category dtoCategory){
 
-        User user = userService.getByToken(token);
-        dtoCategory.setUser(user);
-        user.getCategories().add(dtoCategory);
-        userService.editUser(user);
-
-        return categoryService.findByTitle(dtoCategory.getTitle());
+       return categoryService.createCategory(token, dtoCategory);
     }
-
 
     @DeleteMapping("/categories/{id}/delete")
     @ResponseBody
     public Response deleteCategory(@RequestHeader("Authorization") String token, @PathVariable("id") int categoryId){
-
-        User user = userService.getByToken(token);
-        Category category = categoryService.getById(categoryId);
-        if(user.getCategories().contains(category)){
-            user.getCategories().remove(category);
-            categoryService.delete(categoryId);
-            userService.editUser(user);
-            return new Response(ResponseStatus.SUCCESS, "category has been deleted");
-        }
-         else return new Response(ResponseStatus.ERROR, "current user doesn't have such category");
+        return categoryService.delete(token, categoryId);
     }
-
 
     @PostMapping("/categories/update")
     @ResponseBody
     public Category updateCategory(@RequestHeader("Authorization") String token, @RequestBody Category infCategory){
 
-        Category updCategory = categoryService.getById(infCategory.getId());
-        updCategory.setTitle(infCategory.getTitle());
-        categoryService.editCategory(updCategory);
-
-        return  updCategory;
+      return categoryService.update(token, infCategory);
     }
 
 

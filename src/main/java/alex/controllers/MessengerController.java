@@ -7,10 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import java.util.List;
 
 @Controller
-//@RequestMapping("/messengers")
 public class MessengerController {
 
     @Autowired
@@ -18,8 +16,8 @@ public class MessengerController {
 
     @GetMapping(value = "messengers", produces = "application/json")
     @ResponseBody
-    public List<Messenger> allUsers(Model model) {
-        List<Messenger> messengers = messengerService.getAll();
+    public Iterable<Messenger> allUsers(Model model) {
+        Iterable<Messenger> messengers = messengerService.getAll();
 
         return messengers;
     }

@@ -1,8 +1,17 @@
 package alex.service.impl;
 
+import alex.dto.MessengerDto;
+import alex.dto.Response;
+import alex.dto.ResponseStatus;
 import alex.entity.Messenger;
+import alex.entity.User;
+import alex.entity.UsersMessengers;
 import alex.repository.MessengerRepository;
+import alex.repository.UserRepository;
+import alex.repository.UsersMessengersRepository;
 import alex.service.MessengerService;
+import alex.service.UsersMessengersService;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +26,31 @@ public class MessengerServiceImpl implements MessengerService {
     @Autowired
     private MessengerRepository messengerRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    UsersMessengersRepository usersMessengersRepository;
+
 
     @Override
-    public Messenger addMessenger(Messenger Messenger) {
-        Messenger savedMessenger = messengerRepository.save(Messenger);
-        return savedMessenger;
+    public Response changePosition(String token, MessengerDto messenger) {
+        UsersMessengers usersMessengers =
+                usersMessengersRepository.findByUIdMId(userRepository.findByToken(token).getId(), messenger.getId());
+
+        usersMessengers.setPosition(messenger.getPosition());
+        usersMessengersRepository.save(usersMessengers);
+
+        return new Response(ResponseStatus.SUCCESS, "position has been changed");
+    }
+
+    @Override
+    public void removeMessenger(String token, List<Messenger> messengersToDelete) {
+        User user = userRepository.findByToken(token);
+        for (Messenger mess: messengersToDelete) {
+            UsersMessengers usersMessengers =  usersMessengersRepository.findByUIdMId(user.getId(), mess.getId());
+            usersMessengersRepository.deleteById(usersMessengers.getId());
+        }
     }
 
     @Override
@@ -30,18 +59,8 @@ public class MessengerServiceImpl implements MessengerService {
     }
 
     @Override
-    public Messenger getByName(String name) {
-        return messengerRepository.findByName(name);
-    }
-
-    @Override
     public Messenger getById(int messId) {
         return messengerRepository.findById(messId).get();
-    }
-
-    @Override
-    public Messenger editMessenger(Messenger Messenger) {
-        return messengerRepository.save(Messenger);
     }
 
     @Override

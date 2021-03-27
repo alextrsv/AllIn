@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface FavoritesService {
     Favorites getById(int id);
-    Favorites edit(Favorites favorites);
     List<Favorites> getAll();
     void deleteByDialogToUserId(int dialogToUserId);
-    void deleteBy2Id(int dialogToUserId, int categoryId);
 }
