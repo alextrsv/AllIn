@@ -51,33 +51,48 @@ public class DialogController {
 
     @PostMapping("dialog/add/{id}")
     @ResponseBody
-    private Response createNewDialog(@PathVariable("id") int messId, @RequestHeader("Authorization") String token){
+    private Response createNewDialog(@PathVariable("id") int messId, @RequestHeader("Authorization") String token,
+                                     @RequestBody User userTo){
 
-        User user = userService.getByToken(token);
+        User userFrom = userService.getByToken(token);
+        userTo = userService.getById(userTo.getId());
 
-        List<Messenger> messengersOfUser = new ArrayList<Messenger>();
-        for (UsersMessengers useMes: user.getUsMes()) {
-            messengersOfUser.add(useMes.getMessenger());
+        List<Messenger> messengersOfUserFrom = new ArrayList<Messenger>();
+        List<Messenger> messengersOfUserTo = new ArrayList<Messenger>();
+        for (UsersMessengers useMes: userFrom.getUsMes()) {
+            messengersOfUserFrom.add(useMes.getMessenger());
         }
+        for (UsersMessengers useMes: userTo.getUsMes()) {
+            messengersOfUserTo.add(useMes.getMessenger());
+        }
+
         Messenger currentMessenger = messengerService.getById(messId);
 
-        if(!messengersOfUser.contains(currentMessenger))
+        if(!messengersOfUserFrom.contains(currentMessenger))
             return new Response(ResponseStatus.ERROR, "This user do not have such messenger");
+        else if (messengersOfUserFrom.contains(currentMessenger) && !messengersOfUserTo.contains(currentMessenger))
+            return new Response(ResponseStatus.ERROR, "You sobesednik do not have such messenger");
         else {
-
             Dialog dialog = new Dialog();
             dialog.setIcon("Icon2");
             dialog.setNote("testing http dialog adding");
             dialog.setTitle("DIALOG2");
             dialog.setMessenger(messengerService.getById(messId));
 
-            DialogToUser dialogToUser = new DialogToUser();
+            DialogToUser dialogToUserFrom = new DialogToUser();
 
-            dialogToUser.setDialog(dialog);
-            dialogToUser.setUser(user);
+            dialogToUserFrom.setDialog(dialog);
+            dialogToUserFrom.setUser(userFrom);
+
+            DialogToUser dialogToUserTo = new DialogToUser();
+
+            dialogToUserTo.setDialog(dialog);
+            dialogToUserTo.setUser(userTo);
+
 
             dialogService.edit(dialog);
-            dialogToUserService.edit(dialogToUser);
+            dialogToUserService.edit(dialogToUserFrom);
+            dialogToUserService.edit(dialogToUserTo);
             return new Response(ResponseStatus.SUCCESS, "New dialog has been created");
 
         }
