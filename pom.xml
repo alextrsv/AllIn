@@ -8,10 +8,10 @@
 		<version>2.3.4.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>AllIn</groupId>
-	<artifactId>all-in-server</artifactId>
+	<groupId>Pshoo</groupId>
+	<artifactId>pshoo-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>AllInServer</name>
+	<name>PshooServer</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
