@@ -1,0 +1,141 @@
+package alex.controllers;
+
+import alex.ServerApplication;
+import alex.handlers.TelegClient;
+import alex.model.Dialog;
+import alex.model.TelegramMess;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import it.tdlight.common.Init;
+import it.tdlight.common.utils.CantLoadLibrary;
+import it.tdlight.jni.TdApi;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+
+@RestController
+public class TelegramController {
+
+    @Autowired
+    ObjectMapper mapper;
+    public static Map<String, TelegClient> clients = new HashMap<>();
+    private int directoryNumber = 11;
+
+    static{
+        try {
+            Init.start();
+        } catch (CantLoadLibrary cantLoadLibrary) {
+            cantLoadLibrary.printStackTrace();
+        }
+    }
+
+    @PostMapping(value = "/telegram_auth", produces = "application/json")
+    public ObjectNode telegramAuth(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> object){
+//        Gson gson = new Gson();
+//        JsonObject jsonObject = gson.fromJson(object, JsonObject.class);
+//
+//        ServerApplication.logger.info(jsonObject.toString());
+
+//        String phone = object.get("phone").getAsString();
+//        int mess_id = object.get("mess_id").getAsIn
+
+
+        String phone = (String)object.get("phone");
+        int mess_id = (Integer)object.get("mess_id");
+
+        ServerApplication.logger.info("telegram_auth" + phone + mess_id);
+        try {
+            TelegClient client = new TelegClient();
+            client.setPhoneNumber(phone);
+            clients.put(token, client);
+            client.createNewClient(directoryNumber);
+            directoryNumber++;
+        }catch (Exception ex){
+            ServerApplication.logger.info("Authorization failed");
+            return mapper.createObjectNode().put("status","error").put("comment", ex.getMessage());
+
+        }
+        ServerApplication.logger.info("Authorization is done");
+        return mapper.createObjectNode().put("status","success").put("comment", "");
+    }
+
+    @PostMapping("/telegram_code")
+    public ObjectNode telegramCode(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> map){
+        ServerApplication.logger.info("telegram_code");
+        String code = (String)map.get("confirm_code");
+
+        clients.get(token).setCode(code);
+        return mapper.createObjectNode().put("status","success").put("comment", "");
+    }
+
+    @GetMapping(value = "/telegram_gci/{mess_id}", produces = "application/json")
+    public List<Dialog> telegramGetChatsId(@RequestHeader("Authorization") String token, @PathVariable("mess_id") int mess_id){
+        ServerApplication.logger.info("telegram_gci " + mess_id);
+        return clients.get(token).gci();
+    }
+
+    @PostMapping("/telegram_lo")
+    public ObjectNode telegramLogOut(@RequestHeader("Authorization") String token){
+        ServerApplication.logger.info("telegram_lo");
+        clients.get(token).logOut();
+        return mapper.createObjectNode().put("status","success").put("comment", "");
+    }
+
+    @GetMapping(value = "/telegram_history/{mess_id}/{chat_id}", produces = "application/json")
+    @ResponseBody
+    public List<TelegramMess> telegramGetChatHistory(@RequestHeader("Authorization") String token, @PathVariable("chat_id") long chatId){
+//        TdApi.Message[] messages = clients.get(token).getHistoryFromChat(chatId, 0, 50);
+//
+//        System.out.println("messages were got");
+//        List<TelegramMess> list = new ArrayList<>();
+//        for (TdApi.Message message:
+//                messages) {
+//
+//            String text = "";
+//            try {
+//                text = ((TdApi.MessageText) message.content).text.text;
+//            }catch(ClassCastException ex){
+//                text = "недопустимый символ";
+//            }
+//
+////            System.out.println("call ");
+////            clients.get(token).getClientId();
+//            list.add(new TelegramMess(message.id, text, new Date(message.date*1000L), clients.get(token).getMessageType(message)));
+//        }
+//
+//        return list;
+
+        List<TelegramMess> list = new ArrayList<>();
+        String lastMsgText = "";
+        TdApi.Message lastMess = clients.get(token).getHistoryFromChat(chatId, 0, 1)[0];
+        try {
+            lastMsgText = ((TdApi.MessageText) lastMess.content).text.text;
+        }catch(ClassCastException ex){
+            lastMsgText = "недопустимый символ";
+        }
+
+        list.add(new TelegramMess(lastMess.id, lastMsgText, new Date(lastMess.date*1000L), clients.get(token).getMessageType(lastMess)));
+
+        System.out.println("Last Message was gotten!");
+
+        TdApi.Message[] messages = clients.get(token).getHistoryFromChat(chatId, 0, 50);
+        System.out.println("messages were gotten");
+        for (TdApi.Message message:
+                messages) {
+            String text = "";
+            try {
+                text = ((TdApi.MessageText) message.content).text.text;
+            }catch(ClassCastException ex){
+                text = "недопустимый символ";
+            }
+
+//            System.out.println("call ");
+//            clients.get(token).getClientId();
+            list.add(new TelegramMess(message.id, text, new Date(message.date*1000L), clients.get(token).getMessageType(message)));
+
+        }
+
+        return list;
+    }
+}
