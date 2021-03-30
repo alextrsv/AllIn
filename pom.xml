@@ -18,6 +18,14 @@
 		<java.version>1.8</java.version>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>mchv</id>
+			<name>MCHV Apache Maven Packages</name>
+			<url>https://mvn.mchv.eu/repository/mchv/</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -79,7 +87,55 @@
 			<artifactId>guava</artifactId>
 			<version>30.0-jre</version>
 		</dependency>
+		<dependency>
+			<groupId>it.tdlight</groupId>
+			<artifactId>tdlight-java</artifactId>
+			<version>3.171.4</version>
+		</dependency>
+		<dependency>
+			<groupId>it.tdlight</groupId>
+			<artifactId>tdlight-api</artifactId>
+			<version>3.2.54</version>
+		</dependency>
+		<dependency>
+			<groupId>it.tdlight</groupId>
+			<artifactId>tdlight-natives-linux-amd64</artifactId>
+			<version>3.2.54</version>
+			<optional>true</optional>
+		</dependency>
 
+		<!--		<dependency>-->
+		<!--			<groupId>it.tdlight</groupId>-->
+		<!--			<artifactId>tdlight-natives-windows-amd64</artifactId>-->
+		<!--			<version>3.2.54</version>-->
+		<!--			<optional>true</optional>-->
+		<!--		</dependency>-->
+
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.30</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+		<!--        <dependency>-->
+		<!--            <groupId>org.slf4j</groupId>-->
+		<!--            <artifactId>slf4j-simple</artifactId>-->
+		<!--            <version>1.7.30</version>-->
+		<!--        </dependency>-->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.30</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20201115</version>
+		</dependency>
 	</dependencies>
 
 
