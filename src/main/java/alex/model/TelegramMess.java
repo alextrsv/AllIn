@@ -6,13 +6,13 @@ public class TelegramMess {
     private long mess_id;
     private String mess_text;
     private int mess_time;
-    private String mess_type;
+    private String mess_direct;
 
-    public TelegramMess(long mess_id, String mess_text, int mess_time, String mess_type) {
+    public TelegramMess(long mess_id, String mess_text, int mess_time, String mess_direct) {
         this.mess_id = mess_id;
         this.mess_text = mess_text;
         this.mess_time = mess_time;
-        this.mess_type = mess_type;
+        this.mess_direct = mess_direct;
     }
 
     public long getMess_id() {
@@ -27,8 +27,8 @@ public class TelegramMess {
         return mess_time;
     }
 
-    public String getMess_type() {
-        return mess_type;
+    public String getMess_direct() {
+        return mess_direct;
     }
 }
 

@@ -137,7 +137,7 @@ public class SocketHandler extends TextWebSocketHandler {
         ServerApplication.logger.info("handleTextMessage method");
 
         //messageId - это наш сгенерированный id
-        int messageId = (int)values.get("mess_rand_id");
+        long messageId = (long)values.get("mess_rand_id");
         String content = values.get("text").toString();
         int time = (int)values.get("mess_time");
         ServerApplication.logger.info("mess_rand_id = " + messageId + " content = " + content);
