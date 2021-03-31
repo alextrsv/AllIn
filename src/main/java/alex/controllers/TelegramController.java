@@ -76,13 +76,13 @@ public class TelegramController {
     @GetMapping(value = "/telegram_gci/{mess_id}", produces = "application/json")
     public List<Dialog> telegramGetChatsId(@RequestHeader("Authorization") String token, @PathVariable("mess_id") int mess_id){
         ServerApplication.logger.info("telegram_gci " + mess_id);
-        List<Dialog> dialogs = clients.get(token).gci();
+//        List<Dialog> dialogs = clients.get(token).gci();
 //        for (Dialog d:
 //             dialogs) {
 //            chatService.addChat(d.getId(), token, mess_id);
 //        }
 
-        return dialogs;
+        return clients.get(token).gci();
     }
 
     @PostMapping("/telegram_lo")

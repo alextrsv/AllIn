@@ -1,10 +1,7 @@
 package alex.handlers;
 
 import alex.ServerApplication;
-import alex.controllers.MessageController;
 import alex.controllers.TelegramController;
-import alex.fcm_base.FCMService;
-import alex.model.PushNotificationRequest;
 import com.google.gson.Gson;
 import it.tdlight.jni.TdApi;
 import org.json.JSONObject;
@@ -16,12 +13,9 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 
 @Component
 
