@@ -54,3 +54,10 @@ CREATE TABLE favorites(
         category_id INTEGER REFERENCES category(id),
         PRIMARY KEY (category_id, dialog_to_user_id)
 );
+
+CREATE TABLE chat{
+        id SERIAL,
+        token text,
+        messenger_id INTEGER REFERENCES messenger(id),
+        PRIMARY KEY (id, text, messenger_id)
+}

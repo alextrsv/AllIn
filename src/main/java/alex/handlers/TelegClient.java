@@ -85,6 +85,10 @@ public final class TelegClient {
 
     private String prefix = "http://dry-brook-08386.herokuapp.com";
 
+    public int getUserId(){
+        return this.userId;
+    }
+
     public TelegClient() {
     }
 
@@ -287,9 +291,10 @@ public final class TelegClient {
 //                                    ServerApplication.logger.info("chat1 = " + chat1);
 
                                     try {
-                                        d.setLastMsg_date(new Date(chat1.lastMessage.date * 1000L));
+//                                        d.setLastMsg_date(new Date(chat1.lastMessage.date * 1000L));
+                                        d.setLastMsg_date(chat1.lastMessage.date);
                                     } catch (Exception e) {
-                                        d.setLastMsg_date(new Date(0));
+                                        d.setLastMsg_date(-1);
                                     }
 
                                     try {

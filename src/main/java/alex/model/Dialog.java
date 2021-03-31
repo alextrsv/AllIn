@@ -8,7 +8,7 @@ public class Dialog {
     private String icon;
     private String note = "empty";
     private String lastMsg_text = "";
-    private Date lastMsg_date;
+    private int lastMsg_date;
     private String lastMsg_type;
     private boolean is_favorite = false;
     private String type = "ordinary";
@@ -50,7 +50,7 @@ public class Dialog {
         return lastMsg_text;
     }
 
-    public Date getLastMsg_date() {
+    public int getLastMsg_date() {
         return lastMsg_date;
     }
 
@@ -66,7 +66,7 @@ public class Dialog {
         this.lastMsg_text = lastMsg_text;
     }
 
-    public void setLastMsg_date(Date lastMsg_date) {
+    public void setLastMsg_date(int lastMsg_date) {
         this.lastMsg_date = lastMsg_date;
     }
 
@@ -75,7 +75,7 @@ public class Dialog {
         this.title = title;
     }
 
-    public Dialog(Long id, String title, String icon, String lastMsg_text, Date lastMsg_date) {
+    public Dialog(Long id, String title, String icon, String lastMsg_text, int lastMsg_date) {
         this.id = id;
         this.title = title;
         this.icon = icon;

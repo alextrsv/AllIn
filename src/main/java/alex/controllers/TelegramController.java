@@ -4,6 +4,7 @@ import alex.ServerApplication;
 import alex.handlers.TelegClient;
 import alex.model.Dialog;
 import alex.model.TelegramMess;
+//import alex.service.ChatService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.tdlight.common.Init;
@@ -16,6 +17,9 @@ import java.util.*;
 
 @RestController
 public class TelegramController {
+
+//    @Autowired
+//    private ChatService chatService;
 
     @Autowired
     ObjectMapper mapper;
@@ -72,7 +76,13 @@ public class TelegramController {
     @GetMapping(value = "/telegram_gci/{mess_id}", produces = "application/json")
     public List<Dialog> telegramGetChatsId(@RequestHeader("Authorization") String token, @PathVariable("mess_id") int mess_id){
         ServerApplication.logger.info("telegram_gci " + mess_id);
-        return clients.get(token).gci();
+        List<Dialog> dialogs = clients.get(token).gci();
+//        for (Dialog d:
+//             dialogs) {
+//            chatService.addChat(d.getId(), token, mess_id);
+//        }
+
+        return dialogs;
     }
 
     @PostMapping("/telegram_lo")
@@ -115,7 +125,7 @@ public class TelegramController {
             lastMsgText = "недопустимый символ";
         }
 
-        list.add(new TelegramMess(lastMess.id, lastMsgText, new Date(lastMess.date*1000L), clients.get(token).getMessageType(lastMess)));
+        list.add(new TelegramMess(lastMess.id, lastMsgText, lastMess.date, clients.get(token).getMessageType(lastMess)));
 
         System.out.println("Last Message was gotten!");
 
@@ -132,7 +142,7 @@ public class TelegramController {
 
 //            System.out.println("call ");
 //            clients.get(token).getClientId();
-            list.add(new TelegramMess(message.id, text, new Date(message.date*1000L), clients.get(token).getMessageType(message)));
+            list.add(new TelegramMess(message.id, text, message.date, clients.get(token).getMessageType(message)));
 
         }
 

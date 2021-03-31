@@ -5,10 +5,10 @@ import java.util.Date;
 public class TelegramMess {
     private long mess_id;
     private String mess_content;
-    private Date mess_date;
+    private int mess_date;
     private String mess_type;
 
-    public TelegramMess(long mess_id, String mess_content, Date mess_date, String mess_type) {
+    public TelegramMess(long mess_id, String mess_content, int mess_date, String mess_type) {
         this.mess_id = mess_id;
         this.mess_content = mess_content;
         this.mess_date = mess_date;
@@ -23,7 +23,7 @@ public class TelegramMess {
         return mess_content;
     }
 
-    public Date getMess_date() {
+    public int getMess_date() {
         return mess_date;
     }
 
