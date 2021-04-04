@@ -15,4 +15,9 @@ public interface DialogToUserRepository extends CrudRepository<DialogToUser, Int
             " du.user.id = :user_id")
     DialogToUser findByDidUid(@Param("dialog_id") Integer dialogId, @Param("user_id") Integer userId);
 
+    @Query("select du from DialogToUser du where du.dialog.id = :dialog_id")
+    Iterable<DialogToUser> findByDid(@Param("dialog_id") Integer dialogId);
+
+
+
 }

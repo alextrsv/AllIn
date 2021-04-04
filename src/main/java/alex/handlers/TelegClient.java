@@ -1,12 +1,15 @@
 package alex.handlers;
 
 import alex.ServerApplication;
+import alex.entity.DialogToUser;
 import alex.model.Dialog;
+import alex.service.DialogToUserService;
 import it.tdlight.common.ExceptionHandler;
 import it.tdlight.common.ResultHandler;
 import it.tdlight.common.TelegramClient;
 import it.tdlight.jni.TdApi;
 import it.tdlight.tdlight.ClientManager;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
 import java.util.*;
@@ -84,6 +87,11 @@ public final class TelegClient {
     private volatile int numberOfFiles = 0;
 
     private String prefix = "http://dry-brook-08386.herokuapp.com";
+
+    @Autowired
+    private DialogToUserService dialogToUserService;
+
+
 
     public int getUserId(){
         return this.userId;
@@ -278,6 +286,11 @@ public final class TelegClient {
                 synchronized (chat) {
                     Dialog d = new Dialog(chatId, chat.title);
                     needLocked[0] = true;
+
+                    //вставка в таблицу значений
+//                    dialogToUserService.saveDialogToUser(new DialogToUser());
+
+
 
                     client.send(new TdApi.GetChat(chatId), new ResultHandler() {
                         @Override
@@ -1049,6 +1062,12 @@ public final class TelegClient {
                     }
                     break;
                 }
+
+                case TdApi.NotificationTypeNewMessage.CONSTRUCTOR:
+                    TdApi.Message mess = (TdApi.Message)object;
+                    System.out.println("New Message recieved " + mess.toString());
+
+
                 case TdApi.UpdateChatIsMarkedAsUnread.CONSTRUCTOR: {
 //                    ServerApplication.logger.info("Update Handler UpdateChatIsMarkedAsUnread");
                     TdApi.UpdateChatIsMarkedAsUnread update = (TdApi.UpdateChatIsMarkedAsUnread) object;

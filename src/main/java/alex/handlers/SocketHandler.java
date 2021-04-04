@@ -2,17 +2,24 @@ package alex.handlers;
 
 import alex.ServerApplication;
 import alex.controllers.TelegramController;
+import alex.entity.DialogToUser;
+import alex.entity.User;
+import alex.service.DialogService;
+import alex.service.DialogToUserService;
+import alex.service.UserService;
 import com.google.gson.Gson;
 import it.tdlight.jni.TdApi;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +30,15 @@ public class SocketHandler extends TextWebSocketHandler {
     private static final Logger logger = LoggerFactory.getLogger(SocketHandler.class);
     private final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890@$#^&?*()}{][%";
     public static Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private DialogService dialogService;
+
+    @Autowired
+    private DialogToUserService dialogToUserService;
+
 
     @Override
     protected void handlePongMessage(WebSocketSession session, PongMessage message) throws Exception {
@@ -131,36 +147,52 @@ public class SocketHandler extends TextWebSocketHandler {
         ServerApplication.logger.info("handleTextMessage method");
 
         //messageId - это наш сгенерированный id
-        long messageId = (long)values.get("mess_rand_id");
+        long messageId = (long) values.get("mess_rand_id");
         String content = values.get("text").toString();
-        int time = (int)values.get("mess_time");
+        int time = (int) values.get("mess_time");
         ServerApplication.logger.info("mess_rand_id = " + messageId + " content = " + content);
+        String senderToken = (String) session.getAttributes().get("senderToken");
 
-        switch ((int) session.getAttributes().get("messengerId")){
+        switch ((int) session.getAttributes().get("messengerId")) {
             case 1:
-                TdApi.Message message1 = (TelegramController.clients.get((String)session.getAttributes().get("senderToken"))).sendMessage((String)session.getAttributes().get("chatId"), content);
+                TdApi.Message message1 = (TelegramController.clients.get((String) session.getAttributes().get("senderToken"))).sendMessage((String) session.getAttributes().get("chatId"), content);
 
                 JSONObject object = new JSONObject();
 
                 object.put("mess_rand_id", messageId);
                 object.put("mess_api_id", message1.id);
                 object.put("mess_text", content);
-                object.put("mess_direct", "out");
+//                object.put("mess_direct", "out");
                 object.put("mess_time", time);
 
 
                 //Отправка сообщения в сессию отпправителю
-                session.sendMessage(new TextMessage(object.toString()));
+//                session.sendMessage(new TextMessage(object.toString()));
 
                 //Отправоляем объект Message получателю в сессию
                 object.put("mess_direct", "in");
-                String recipientToken = "";
 
-                try {
-                    //Пытаемся отправить сообщение отправителю в сессию
-                    //Отправится при условии, что получатель сидит в диалоге
-                    sessions.get(recipientToken).sendMessage(new TextMessage(object.toString()));
-                } catch (Exception e) {
+//                User userSender = userService.getByToken((String) session.getAttributes().get("senderToken"));
+//                userSender.getDialogToUserCollection()
+                List<DialogToUser> dialogsToUsers = dialogToUserService.getUsersByChatId(Integer.parseInt((String) session.getAttributes().get("chatId")));
+                for (DialogToUser d :
+                        dialogsToUsers) {
+                    if (d.getUser().getToken().equals(senderToken)) {
+                        object.put("mess_direct", "out");
+                        session.sendMessage(new TextMessage(object.toString()));
+                        object.put("mess_direct", "in");
+                        continue;
+                    }
+
+                    if(d.getDialog().getMessenger().getId() != 1){
+                        continue;
+                    }
+
+                    try {
+                        //Пытаемся отправить сообщение отправителю в сессию
+                        //Отправится при условии, что получатель сидит в диалоге
+                        sessions.get(d.getUser().getToken()).sendMessage(new TextMessage(object.toString()));
+                    } catch (Exception e) {
 //                    String singleUseToken = generateSingleUseToken(16);
 //                    logger.info("singleUseToken = " + singleUseToken);
 //                    logger.info("senderId = " + senderId);
@@ -188,6 +220,7 @@ public class SocketHandler extends TextWebSocketHandler {
 //                    } catch (ExecutionException executionException) {
 //                        logger.error(executionException.getMessage());
 //                    }
+                    }
                 }
 
                 break;
@@ -213,7 +246,7 @@ public class SocketHandler extends TextWebSocketHandler {
         super.afterConnectionClosed(session, status);
     }
 
-    public String generateSingleUseToken(int length){
+    public String generateSingleUseToken(int length) {
         Random random = new SecureRandom();
         StringBuilder sb = new StringBuilder(length);
         for (int i = 0; i < length; i++) {

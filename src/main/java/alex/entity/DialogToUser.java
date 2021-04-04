@@ -33,6 +33,8 @@ public class DialogToUser {
         return favorites;
     }
 
+
+
     public void setFavorites(Collection<Favorites> favorites) {
         this.favorites = favorites;
     }
