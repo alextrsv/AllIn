@@ -86,12 +86,16 @@ public final class TelegClient {
     private volatile List<Dialog> dialogs = new ArrayList<>();
     private volatile int numberOfFiles = 0;
 
+    private String token;
+
     private String prefix = "http://dry-brook-08386.herokuapp.com";
 
     @Autowired
     private DialogToUserService dialogToUserService;
 
-
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     public int getUserId(){
         return this.userId;
@@ -1111,6 +1115,12 @@ public final class TelegClient {
                     TdApi.UpdateSupergroupFullInfo updateSupergroupFullInfo = (TdApi.UpdateSupergroupFullInfo) object;
                     supergroupsFullInfo.put(updateSupergroupFullInfo.supergroupId, updateSupergroupFullInfo.supergroupFullInfo);
                     break;
+
+                case TdApi.UpdateNewMessage.CONSTRUCTOR:
+                    ServerApplication.logger.info("TdApi.UpdateNewMessage.CONSTRUCTOR");
+                    TdApi.Message message = (TdApi.Message) object;
+                    SocketHandler.sendMessageFromTelegram(message, token, getMessageType(message));
+
                 default:
                     // print("Unsupported update:" + newLine + object);
             }

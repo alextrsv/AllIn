@@ -54,6 +54,7 @@ public class TelegramController {
             client.setPhoneNumber(phone);
             clients.put(token, client);
             client.createNewClient(directoryNumber);
+            client.setToken(token);
             directoryNumber++;
         }catch (Exception ex){
             ServerApplication.logger.info("Authorization failed");

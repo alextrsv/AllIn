@@ -145,7 +145,6 @@ public class SocketHandler extends TextWebSocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws InterruptedException, IOException {
         Map<String, Object> values = new Gson().fromJson(message.getPayload(), Map.class);
         ServerApplication.logger.info("handleTextMessage method");
-
         //messageId - это наш сгенерированный id
         long messageId = (long) values.get("mess_rand_id");
         String content = values.get("text").toString();
@@ -153,28 +152,32 @@ public class SocketHandler extends TextWebSocketHandler {
         ServerApplication.logger.info("mess_rand_id = " + messageId + " content = " + content);
         String senderToken = (String) session.getAttributes().get("senderToken");
 
+
         switch ((int) session.getAttributes().get("messengerId")) {
             case 1:
-                TdApi.Message message1 = (TelegramController.clients.get((String) session.getAttributes().get("senderToken"))).sendMessage((String) session.getAttributes().get("chatId"), content);
+                TdApi.Message message1 = (TelegramController.clients.get((String) session.getAttributes().get("senderToken"))).sendMessage((String) session.getAttributes().get("chatId"),
+                        values.get("text").toString());
 
                 JSONObject object = new JSONObject();
 
                 object.put("mess_rand_id", messageId);
                 object.put("mess_api_id", message1.id);
                 object.put("mess_text", content);
-//                object.put("mess_direct", "out");
+                object.put("mess_direct", "out");
                 object.put("mess_time", time);
 
 
                 //Отправка сообщения в сессию отпправителю
-//                session.sendMessage(new TextMessage(object.toString()));
+                session.sendMessage(new TextMessage(object.toString()));
 
                 //Отправоляем объект Message получателю в сессию
                 object.put("mess_direct", "in");
 
 //                User userSender = userService.getByToken((String) session.getAttributes().get("senderToken"));
 //                userSender.getDialogToUserCollection()
+
                 List<DialogToUser> dialogsToUsers = dialogToUserService.getUsersByChatId(Integer.parseInt((String) session.getAttributes().get("chatId")));
+                ServerApplication.logger.info("before for");
                 for (DialogToUser d :
                         dialogsToUsers) {
                     if (d.getUser().getToken().equals(senderToken)) {
@@ -184,7 +187,7 @@ public class SocketHandler extends TextWebSocketHandler {
                         continue;
                     }
 
-                    if(d.getDialog().getMessenger().getId() != 1){
+                    if (d.getDialog().getMessenger().getId() != 1) {
                         continue;
                     }
 
@@ -222,12 +225,57 @@ public class SocketHandler extends TextWebSocketHandler {
 //                    }
                     }
                 }
-
                 break;
             case 2:
                 break;
         }
     }
+
+    public static void sendMessageFromTelegram(TdApi.Message message, String token, String messageType) {
+        ServerApplication.logger.info("void sendMessageFromTelegram New Message was gotten");
+        ServerApplication.logger.info("token = " + token + " messageType = " + messageType);
+        JSONObject object = new JSONObject();
+        object.put("mess_rand_id", -1);
+        object.put("mess_api_id", message.id);
+        object.put("mess_text", ((TdApi.MessageText) message.content).text.text);
+        object.put("mess_time", message.date);
+        object.put("mess_direct", messageType);
+
+
+        try {
+            sessions.get(token).sendMessage(new TextMessage(object.toString()));
+        } catch (Exception e) {
+//                    String singleUseToken = generateSingleUseToken(16);
+//                    logger.info("singleUseToken = " + singleUseToken);
+//                    logger.info("senderId = " + senderId);
+//                    MessageController.tokens.put(singleUseToken, senderId);
+//
+//                    Map<String, String> map = new HashMap<>();
+//                    map.put("notification_token", singleUseToken);
+//                    map.put("chat_id", "123");
+//                    map.put("messenger_id", "3");
+//
+//                    PushNotificationRequest pushNotificationRequest = new PushNotificationRequest();
+//
+//                    //Все параметры берутся из бд
+//                    pushNotificationRequest.setToken("fhsrKfmWS-61TiRkyGuqtQ:APA91bGEP1MT4p1T2nEoKLsQNn7sqLUgL2eyxHOodqeSW_uZ54Vp5YFEpHOMsMhzekLU0Rv0rb4wfj4XHcF-YsYYfslJa247koqLX335Pc5OapxFWxy1VNVe5i8HEeDsWW81l6F8i2Yo");
+//                    pushNotificationRequest.setTitle(senderId);
+//                    pushNotificationRequest.setMessage(content);
+//                    pushNotificationRequest.setMap(map);
+//
+////            PushNotificationService pushNotificationService = new PushNotificationService(new FCMService());
+//                    FCMService service = new FCMService();
+//                    logger.info("bool = " + service);
+//
+//                    try {
+//                        service.sendMessageToToken(pushNotificationRequest);
+//                    } catch (ExecutionException executionException) {
+//                        logger.error(executionException.getMessage());
+//                    }
+        }
+
+    }
+
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
