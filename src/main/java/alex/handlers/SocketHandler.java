@@ -144,9 +144,12 @@ public class SocketHandler extends TextWebSocketHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws InterruptedException, IOException {
         Map<String, Object> values = new Gson().fromJson(message.getPayload(), Map.class);
+        JSONObject object1 = new JSONObject(message.getPayload());
         ServerApplication.logger.info("handleTextMessage method");
         //messageId - это наш сгенерированный id
-        long messageId = (long) values.get("mess_rand_id");
+//        long messageId = (long) values.get("mess_rand_id");
+        long messageId = object1.getLong("mess_rand_id");
+
         String content = values.get("text").toString();
         int time = (int) values.get("mess_time");
         ServerApplication.logger.info("mess_rand_id = " + messageId + " content = " + content);
@@ -196,6 +199,7 @@ public class SocketHandler extends TextWebSocketHandler {
                         //Отправится при условии, что получатель сидит в диалоге
                         sessions.get(d.getUser().getToken()).sendMessage(new TextMessage(object.toString()));
                     } catch (Exception e) {
+
 //                    String singleUseToken = generateSingleUseToken(16);
 //                    logger.info("singleUseToken = " + singleUseToken);
 //                    logger.info("senderId = " + senderId);

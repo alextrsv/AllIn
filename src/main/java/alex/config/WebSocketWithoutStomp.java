@@ -48,7 +48,7 @@ public class WebSocketWithoutStomp implements WebSocketConfigurer {
                 attributes.put("messengerId", messengerId);
                 attributes.put("chatId", chatId);
 
-                ServerApplication.logger.info("senderToken = " + senderToken + " messengerId = " + messengerId + " chatd = " + chatId);
+                ServerApplication.logger.info("senderToken = " + senderToken + " messengerId = " + messengerId + " chatId = " + chatId);
                 return true;
             }
 
