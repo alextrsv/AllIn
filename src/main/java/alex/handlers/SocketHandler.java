@@ -143,23 +143,26 @@ public class SocketHandler extends TextWebSocketHandler {
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws InterruptedException, IOException {
-        Map<String, Object> values = new Gson().fromJson(message.getPayload(), Map.class);
+//        Map<String, Object> values = new Gson().fromJson(message.getPayload(), Map.class);
         JSONObject object1 = new JSONObject(message.getPayload());
         ServerApplication.logger.info("handleTextMessage method");
         //messageId - это наш сгенерированный id
 //        long messageId = (long) values.get("mess_rand_id");
         long messageId = object1.getLong("mess_rand_id");
+        String content = object1.getString("mess_text");
+        int time = object1.getInt("mess_time");
 
-        String content = values.get("mess_text").toString();
-        int time = (int) values.get("mess_time");
+//        String content = values.get("mess_text").toString();
+//        int time = (int) values.get("mess_time");
+
+
         ServerApplication.logger.info("mess_rand_id = " + messageId + " content = " + content);
         String senderToken = (String) session.getAttributes().get("senderToken");
 
 
         switch ((int) session.getAttributes().get("messengerId")) {
             case 1:
-                TdApi.Message message1 = (TelegramController.clients.get((String) session.getAttributes().get("senderToken"))).sendMessage((String) session.getAttributes().get("chatId"),
-                        values.get("text").toString());
+                TdApi.Message message1 = (TelegramController.clients.get((String) session.getAttributes().get("senderToken"))).sendMessage((String) session.getAttributes().get("chatId"), content);
 
                 JSONObject object = new JSONObject();
 
