@@ -10,6 +10,8 @@ import alex.model.PushNotificationRequest;
 import alex.service.DialogService;
 import alex.service.DialogToUserService;
 import alex.service.UserService;
+import alex.service.impl.DialogToUserServiceImpl;
+import alex.service.impl.UserServiceImpl;
 import com.google.gson.Gson;
 import it.tdlight.jni.TdApi;
 import org.json.JSONObject;
@@ -35,14 +37,14 @@ public class SocketHandler extends TextWebSocketHandler {
     private static final Logger logger = LoggerFactory.getLogger(SocketHandler.class);
     private static final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890@$#^&?*()}{][%";
     public static Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
-    @Autowired
-    private static UserService userService;
+//    @Autowired
+//    private static UserService userService;
 
-    @Autowired
-    private DialogService dialogService;
+//    @Autowired
+//    private DialogService dialogService;
 
-    @Autowired
-    private DialogToUserService dialogToUserService;
+//    @Autowired
+//    private DialogToUserService dialogToUserService;
 
 
     @Override
@@ -189,6 +191,7 @@ public class SocketHandler extends TextWebSocketHandler {
 
 //                User userSender = userService.getByToken((String) session.getAttributes().get("senderToken"));
 //                userSender.getDialogToUserCollection()
+                DialogToUserService dialogToUserService = new DialogToUserServiceImpl();
 
                 List<DialogToUser> dialogsToUsers = dialogToUserService.getUsersByChatId(Integer.parseInt((String) session.getAttributes().get("chatId")));
                 ServerApplication.logger.info("before for");
@@ -274,6 +277,7 @@ public class SocketHandler extends TextWebSocketHandler {
             PushNotificationRequest pushNotificationRequest = new PushNotificationRequest();
 
             //Все параметры берутся из бд
+            UserService userService = new UserServiceImpl();
             pushNotificationRequest.setToken(userService.getByToken(token).getMsgToken());
             ServerApplication.logger.info("after pushNotificationRequest");
             pushNotificationRequest.setTitle(token);
