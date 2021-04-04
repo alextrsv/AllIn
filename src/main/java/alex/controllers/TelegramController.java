@@ -52,6 +52,7 @@ public class TelegramController {
         try {
             TelegClient client = new TelegClient();
             client.setPhoneNumber(phone);
+            ServerApplication.logger.info("token = " + token);
             clients.put(token, client);
             client.createNewClient(directoryNumber);
             client.setToken(token);

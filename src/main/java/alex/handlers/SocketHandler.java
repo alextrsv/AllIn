@@ -162,6 +162,8 @@ public class SocketHandler extends TextWebSocketHandler {
 
         switch ((int) session.getAttributes().get("messengerId")) {
             case 1:
+                ServerApplication.logger.info("token1 = " + session.getAttributes().get("senderToken"));
+
                 TdApi.Message message1 = (TelegramController.clients.get((String) session.getAttributes().get("senderToken"))).sendMessage((String) session.getAttributes().get("chatId"), content);
 
                 JSONObject object = new JSONObject();
