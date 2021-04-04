@@ -1,9 +1,12 @@
 package alex.handlers;
 
 import alex.ServerApplication;
+import alex.controllers.MessageController;
 import alex.controllers.TelegramController;
 import alex.entity.DialogToUser;
 import alex.entity.User;
+import alex.fcm_base.FCMService;
+import alex.model.PushNotificationRequest;
 import alex.service.DialogService;
 import alex.service.DialogToUserService;
 import alex.service.UserService;
@@ -19,19 +22,21 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 @Component
 
 public class SocketHandler extends TextWebSocketHandler {
     private static final Logger logger = LoggerFactory.getLogger(SocketHandler.class);
-    private final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890@$#^&?*()}{][%";
+    private static final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890@$#^&?*()}{][%";
     public static Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     @Autowired
-    private UserService userService;
+    private static UserService userService;
 
     @Autowired
     private DialogService dialogService;
@@ -177,7 +182,7 @@ public class SocketHandler extends TextWebSocketHandler {
 
                 //Отправка сообщения в сессию отпправителю
                 TelegramController.clients.get((String) session.getAttributes().get("senderToken")).setIgnore(true);
-                session.sendMessage(new TextMessage(object.toString()));
+//                session.sendMessage(new TextMessage(object.toString()));
 
                 //Отправоляем объект Message получателю в сессию
                 object.put("mess_direct", "in");
@@ -255,33 +260,35 @@ public class SocketHandler extends TextWebSocketHandler {
         try {
             sessions.get(token).sendMessage(new TextMessage(object.toString()));
         } catch (Exception e) {
-//                    String singleUseToken = generateSingleUseToken(16);
-//                    logger.info("singleUseToken = " + singleUseToken);
-//                    logger.info("senderId = " + senderId);
-//                    MessageController.tokens.put(singleUseToken, senderId);
-//
-//                    Map<String, String> map = new HashMap<>();
-//                    map.put("notification_token", singleUseToken);
-//                    map.put("chat_id", "123");
-//                    map.put("messenger_id", "3");
-//
-//                    PushNotificationRequest pushNotificationRequest = new PushNotificationRequest();
-//
-//                    //Все параметры берутся из бд
-//                    pushNotificationRequest.setToken("fhsrKfmWS-61TiRkyGuqtQ:APA91bGEP1MT4p1T2nEoKLsQNn7sqLUgL2eyxHOodqeSW_uZ54Vp5YFEpHOMsMhzekLU0Rv0rb4wfj4XHcF-YsYYfslJa247koqLX335Pc5OapxFWxy1VNVe5i8HEeDsWW81l6F8i2Yo");
-//                    pushNotificationRequest.setTitle(senderId);
-//                    pushNotificationRequest.setMessage(content);
-//                    pushNotificationRequest.setMap(map);
-//
-////            PushNotificationService pushNotificationService = new PushNotificationService(new FCMService());
-//                    FCMService service = new FCMService();
-//                    logger.info("bool = " + service);
-//
-//                    try {
-//                        service.sendMessageToToken(pushNotificationRequest);
-//                    } catch (ExecutionException executionException) {
-//                        logger.error(executionException.getMessage());
-//                    }
+            String singleUseToken = generateSingleUseToken(16);
+            logger.info("singleUseToken = " + singleUseToken);
+            logger.info("senderId = " + token);
+            MessageController.tokens.put(singleUseToken, token);
+
+            Map<String, String> map = new HashMap<>();
+            map.put("notification_token", singleUseToken);
+            map.put("chat_id", message.chatId + "");
+            //Исправить
+            map.put("messenger_id", "1");
+
+            PushNotificationRequest pushNotificationRequest = new PushNotificationRequest();
+
+            //Все параметры берутся из бд
+            pushNotificationRequest.setToken(userService.getByToken(token).getMsgToken());
+            ServerApplication.logger.info("after pushNotificationRequest");
+            pushNotificationRequest.setTitle(token);
+            pushNotificationRequest.setMessage(((TdApi.MessageText) message.content).text.text);
+            pushNotificationRequest.setMap(map);
+
+//            PushNotificationService pushNotificationService = new PushNotificationService(new FCMService());
+            FCMService service = new FCMService();
+            logger.info("bool = " + service);
+
+            try {
+                service.sendMessageToToken(pushNotificationRequest);
+            } catch (ExecutionException | InterruptedException executionException) {
+                logger.error(executionException.getMessage());
+            }
         }
 
     }
@@ -304,7 +311,7 @@ public class SocketHandler extends TextWebSocketHandler {
         super.afterConnectionClosed(session, status);
     }
 
-    public String generateSingleUseToken(int length) {
+    public static String generateSingleUseToken(int length) {
         Random random = new SecureRandom();
         StringBuilder sb = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
