@@ -176,9 +176,8 @@ public class SocketHandler extends TextWebSocketHandler {
 
 
                 //Отправка сообщения в сессию отпправителю
-                session.sendMessage(new TextMessage(object.toString()));
                 TelegramController.clients.get((String) session.getAttributes().get("senderToken")).setIgnore(true);
-
+                session.sendMessage(new TextMessage(object.toString()));
 
                 //Отправоляем объект Message получателю в сессию
                 object.put("mess_direct", "in");
