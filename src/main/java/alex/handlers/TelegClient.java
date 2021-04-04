@@ -83,15 +83,18 @@ public final class TelegClient {
 
     private int userId = 0;
     private boolean flag = true;
+    private boolean ignore;
     private volatile List<Dialog> dialogs = new ArrayList<>();
     private volatile int numberOfFiles = 0;
-
     private String token;
-
     private String prefix = "http://dry-brook-08386.herokuapp.com";
 
     @Autowired
     private DialogToUserService dialogToUserService;
+
+    public void setIgnore(boolean ignore) {
+        this.ignore = ignore;
+    }
 
     public void setToken(String token) {
         this.token = token;
@@ -1118,8 +1121,12 @@ public final class TelegClient {
 
                 case TdApi.UpdateNewMessage.CONSTRUCTOR:
                     ServerApplication.logger.info("TdApi.UpdateNewMessage.CONSTRUCTOR");
-                    TdApi.Message message = ((TdApi.UpdateNewMessage)object).message;
-                    SocketHandler.sendMessageFromTelegram(message, token, getMessageType(message));
+                    if(!ignore) {
+                        TdApi.Message message = ((TdApi.UpdateNewMessage) object).message;
+                        SocketHandler.sendMessageFromTelegram(message, token, getMessageType(message));
+                    }else{
+                        ignore = false;
+                    }
 
                 default:
                     // print("Unsupported update:" + newLine + object);
