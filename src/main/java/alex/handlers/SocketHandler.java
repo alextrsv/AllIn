@@ -150,7 +150,7 @@ public class SocketHandler extends TextWebSocketHandler {
 //        long messageId = (long) values.get("mess_rand_id");
         long messageId = object1.getLong("mess_rand_id");
 
-        String content = values.get("text").toString();
+        String content = values.get("mess_text").toString();
         int time = (int) values.get("mess_time");
         ServerApplication.logger.info("mess_rand_id = " + messageId + " content = " + content);
         String senderToken = (String) session.getAttributes().get("senderToken");
