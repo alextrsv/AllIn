@@ -1118,7 +1118,7 @@ public final class TelegClient {
 
                 case TdApi.UpdateNewMessage.CONSTRUCTOR:
                     ServerApplication.logger.info("TdApi.UpdateNewMessage.CONSTRUCTOR");
-                    TdApi.Message message = (TdApi.Message) object;
+                    TdApi.Message message = ((TdApi.UpdateNewMessage)object).message;
                     SocketHandler.sendMessageFromTelegram(message, token, getMessageType(message));
 
                 default:
