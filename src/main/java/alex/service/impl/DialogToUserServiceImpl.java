@@ -27,7 +27,7 @@ public class DialogToUserServiceImpl implements DialogToUserService {
 
     @Override
     public List<DialogToUser> getUsersByChatId(int dialog_id) {
-        return (List<DialogToUser>)dialogToUserRepository.findByDid(dialog_id);
+        return (List<DialogToUser>)dialogToUserRepository.findDialogToUsersByDialog_Id(dialog_id);
     }
 
     @Override

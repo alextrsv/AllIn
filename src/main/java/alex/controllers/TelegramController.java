@@ -1,10 +1,13 @@
 package alex.controllers;
 
 import alex.ServerApplication;
+import alex.entity.DialogToUser;
 import alex.handlers.TelegClient;
 import alex.model.Dialog;
 import alex.model.TelegramMess;
 //import alex.service.ChatService;
+import alex.service.DialogToUserService;
+import alex.service.impl.DialogToUserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.tdlight.common.Init;
@@ -150,4 +153,22 @@ public class TelegramController {
 
         return list;
     }
+
+    @Autowired
+    DialogToUserService dialogToUserService;
+
+    @GetMapping(value="/test")
+    public void test(/*@RequestHeader("Authorization") String token*/){
+//        DialogToUserService dialogToUserService = new DialogToUserServiceImpl();
+
+        List<DialogToUser> dialogsToUsers = dialogToUserService.getUsersByChatId(817388954);
+
+        for (DialogToUser d:
+             dialogsToUsers) {
+            System.out.println(d.getDialog().getId() + " " + d.getUser().getMsgToken());
+        }
+
+    }
+
+
 }

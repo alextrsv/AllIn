@@ -32,20 +32,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 @Component
-
 public class SocketHandler extends TextWebSocketHandler {
+
+    @Autowired
+    DialogToUserService dialogToUserService;
+
+    @Autowired
+    static UserService userService;
+
     private static final Logger logger = LoggerFactory.getLogger(SocketHandler.class);
     private static final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890@$#^&?*()}{][%";
     public static Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
-//    @Autowired
-//    private static UserService userService;
-
-//    @Autowired
-//    private DialogService dialogService;
-
-//    @Autowired
-//    private DialogToUserService dialogToUserService;
-
 
     @Override
     protected void handlePongMessage(WebSocketSession session, PongMessage message) throws Exception {
@@ -191,7 +188,11 @@ public class SocketHandler extends TextWebSocketHandler {
 
 //                User userSender = userService.getByToken((String) session.getAttributes().get("senderToken"));
 //                userSender.getDialogToUserCollection()
-                DialogToUserService dialogToUserService = new DialogToUserServiceImpl();
+//                DialogToUserService dialogToUserService = new DialogToUserServiceImpl();
+
+                if(dialogToUserService == null){
+                    ServerApplication.logger.info("dialogToUserService = null");
+                }
 
                 List<DialogToUser> dialogsToUsers = dialogToUserService.getUsersByChatId(Integer.parseInt((String) session.getAttributes().get("chatId")));
                 ServerApplication.logger.info("before for");
@@ -277,7 +278,12 @@ public class SocketHandler extends TextWebSocketHandler {
             PushNotificationRequest pushNotificationRequest = new PushNotificationRequest();
 
             //Все параметры берутся из бд
-            UserService userService = new UserServiceImpl();
+//            UserService userService = new UserServiceImpl();
+
+            if(userService == null){
+                ServerApplication.logger.info("userService = null");
+            }
+
             pushNotificationRequest.setToken(userService.getByToken(token).getMsgToken());
             ServerApplication.logger.info("after pushNotificationRequest");
             pushNotificationRequest.setTitle(token);
