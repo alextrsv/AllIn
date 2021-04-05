@@ -37,8 +37,8 @@ public final class TelegClient {
 
     private final ResultHandler defaultHandler = new DefaultHandler();
 
-    private final Lock getMeLock = new ReentrantLock();
-    private final Condition gotMeInfo = getMeLock.newCondition();
+//    private final Lock getMeLock = new ReentrantLock();
+//    private final Condition gotMeInfo = getMeLock.newCondition();
 
     private final Lock authorizationLock = new ReentrantLock();
     private final Condition gotAuthorization = authorizationLock.newCondition();
@@ -81,26 +81,23 @@ public final class TelegClient {
     private boolean isBeen = false;
 //    private int directoryNumber = 0;
 
+    private long messRandId = -1;
     private int userId = 0;
     private boolean flag = true;
-    private boolean ignore;
     private volatile List<Dialog> dialogs = new ArrayList<>();
     private volatile int numberOfFiles = 0;
     private String token;
     private String prefix = "http://dry-brook-08386.herokuapp.com";
 
-    @Autowired
-    private DialogToUserService dialogToUserService;
-
-    public void setIgnore(boolean ignore) {
-        this.ignore = ignore;
+    public void setMessRandId(long messRandId) {
+        this.messRandId = messRandId;
     }
 
     public void setToken(String token) {
         this.token = token;
     }
 
-    public int getUserId(){
+    public int getUserId() {
         return this.userId;
     }
 
@@ -296,7 +293,6 @@ public final class TelegClient {
 
                     //вставка в таблицу значений
 //                    dialogToUserService.saveDialogToUser(new DialogToUser());
-
 
 
                     client.send(new TdApi.GetChat(chatId), new ResultHandler() {
@@ -884,8 +880,8 @@ public final class TelegClient {
                     TdApi.UpdateUser updateUser = (TdApi.UpdateUser) object;
                     ServerApplication.logger.info("Update Handler UpdateUser");
                     users.put(updateUser.user.id, updateUser.user);
-                    if(flag){
-                        flag=false;
+                    if (flag) {
+                        flag = false;
                         userId = updateUser.user.id;
                     }
                     break;
@@ -1071,7 +1067,7 @@ public final class TelegClient {
                 }
 
                 case TdApi.NotificationTypeNewMessage.CONSTRUCTOR:
-                    TdApi.Message mess = (TdApi.Message)object;
+                    TdApi.Message mess = (TdApi.Message) object;
                     System.out.println("New Message recieved " + mess.toString());
 
 
@@ -1121,12 +1117,8 @@ public final class TelegClient {
 
                 case TdApi.UpdateNewMessage.CONSTRUCTOR:
                     ServerApplication.logger.info("TdApi.UpdateNewMessage.CONSTRUCTOR");
-                    if(!ignore) {
-                        TdApi.Message message = ((TdApi.UpdateNewMessage) object).message;
-                        SocketHandler.sendMessageFromTelegram(message, token, getMessageType(message));
-                    }else{
-                        ignore = false;
-                    }
+                    TdApi.Message message = ((TdApi.UpdateNewMessage) object).message;
+                    SocketHandler.sendMessageFromTelegram(message, token, getMessageType(message), messRandId);
 
                 default:
                     // print("Unsupported update:" + newLine + object);

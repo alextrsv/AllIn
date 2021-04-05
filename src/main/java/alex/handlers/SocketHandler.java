@@ -171,6 +171,7 @@ public class SocketHandler extends TextWebSocketHandler {
             case 1:
                 ServerApplication.logger.info("token1 = " + session.getAttributes().get("senderToken"));
 
+                TelegramController.clients.get((String) session.getAttributes().get("senderToken")).setMessRandId(messageId);
                 TdApi.Message message1 = (TelegramController.clients.get((String) session.getAttributes().get("senderToken"))).sendMessage((String) session.getAttributes().get("chatId"), content);
 
                 JSONObject object = new JSONObject();
@@ -178,13 +179,12 @@ public class SocketHandler extends TextWebSocketHandler {
                 object.put("mess_rand_id", messageId);
                 object.put("mess_api_id", message1.id);
                 object.put("mess_text", content);
-                object.put("mess_direct", "out");
+//                object.put("mess_direct", "out");
                 object.put("mess_time", time);
 
 
                 //Отправка сообщения в сессию отпправителю
-                TelegramController.clients.get((String) session.getAttributes().get("senderToken")).setIgnore(true);
-                session.sendMessage(new TextMessage(object.toString()));
+//                session.sendMessage(new TextMessage(object.toString()));
 
                 //Отправоляем объект Message получателю в сессию
                 object.put("mess_direct", "in");
@@ -198,9 +198,9 @@ public class SocketHandler extends TextWebSocketHandler {
                 for (DialogToUser d :
                         dialogsToUsers) {
                     if (d.getUser().getToken().equals(senderToken)) {
-                        object.put("mess_direct", "out");
-                        session.sendMessage(new TextMessage(object.toString()));
-                        object.put("mess_direct", "in");
+//                        object.put("mess_direct", "out");
+//                        session.sendMessage(new TextMessage(object.toString()));
+//                        object.put("mess_direct", "in");
                         continue;
                     }
 
@@ -249,11 +249,11 @@ public class SocketHandler extends TextWebSocketHandler {
         }
     }
 
-    public static void sendMessageFromTelegram(TdApi.Message message, String token, String messageType) {
+    public static void sendMessageFromTelegram(TdApi.Message message, String token, String messageType, Long messRandId) {
         ServerApplication.logger.info("void sendMessageFromTelegram New Message was gotten");
         ServerApplication.logger.info("token = " + token + " messageType = " + messageType);
         JSONObject object = new JSONObject();
-        object.put("mess_rand_id", -1);
+        object.put("mess_rand_id", messRandId);
         object.put("mess_api_id", message.id);
         object.put("mess_text", ((TdApi.MessageText) message.content).text.text);
         object.put("mess_time", message.date);
