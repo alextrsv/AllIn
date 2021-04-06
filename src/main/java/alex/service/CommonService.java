@@ -21,8 +21,8 @@ public class CommonService {
         List<Messenger> messengersOfUser = new ArrayList<Messenger>();
 
         for (UsersMessengers useMes: user.getUsMes()) {
-            messengersOfUser.add(useMes.getMessenger());
             useMes.getMessenger().setPosition(useMes.getPosition());
+            messengersOfUser.add(useMes.getMessenger());
         }
         Iterable<Messenger> allMessengers = messengerRepository.findAll();
         for (Messenger mess : allMessengers) {

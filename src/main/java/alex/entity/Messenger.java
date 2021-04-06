@@ -42,13 +42,6 @@ public class Messenger {
         this.title = title;
     }
 
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
-    }
 
     public Collection<UsersMessengers> getUsMes() {
         return usMes;
@@ -89,5 +82,13 @@ public class Messenger {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 }
