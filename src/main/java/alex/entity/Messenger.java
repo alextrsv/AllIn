@@ -30,6 +30,9 @@ public class Messenger {
     @Transient
     private boolean isActivated;
 
+    @Transient
+    private int position;
+
 
     public Messenger() {
     }
@@ -37,6 +40,14 @@ public class Messenger {
 
     public Messenger(String title) {
         this.title = title;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public Collection<UsersMessengers> getUsMes() {
