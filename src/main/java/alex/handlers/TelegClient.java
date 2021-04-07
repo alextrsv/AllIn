@@ -34,8 +34,8 @@ public final class TelegClient {
 
     private final ResultHandler defaultHandler = new DefaultHandler();
 
-    private final Lock getMeLock = new ReentrantLock();
-    private final Condition gotMeInfo = getMeLock.newCondition();
+//    private final Lock getMeLock = new ReentrantLock();
+//    private final Condition gotMeInfo = getMeLock.newCondition();
 
     private final Lock authorizationLock = new ReentrantLock();
     private final Condition gotAuthorization = authorizationLock.newCondition();
@@ -78,12 +78,25 @@ public final class TelegClient {
     private boolean isBeen = false;
 //    private int directoryNumber = 0;
 
+    private long messRandId = -1;
     private int userId = 0;
     private boolean flag = true;
     private volatile List<Dialog> dialogs = new ArrayList<>();
     private volatile int numberOfFiles = 0;
-
+    private String token;
     private String prefix = "http://dry-brook-08386.herokuapp.com";
+
+    public void setMessRandId(long messRandId) {
+        this.messRandId = messRandId;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public int getUserId() {
+        return this.userId;
+    }
 
     public TelegClient() {
     }
@@ -275,6 +288,10 @@ public final class TelegClient {
                     Dialog d = new Dialog(chatId, chat.title);
                     needLocked[0] = true;
 
+                    //вставка в таблицу значений
+//                    dialogToUserService.saveDialogToUser(new DialogToUser());
+
+
                     client.send(new TdApi.GetChat(chatId), new ResultHandler() {
                         @Override
                         public void onResult(TdApi.Object object) {
@@ -287,9 +304,10 @@ public final class TelegClient {
 //                                    ServerApplication.logger.info("chat1 = " + chat1);
 
                                     try {
-                                        d.setLastMsg_date(new Date(chat1.lastMessage.date * 1000L));
+//                                        d.setLastMsg_date(new Date(chat1.lastMessage.date * 1000L));
+                                        d.setLastMsg_date(chat1.lastMessage.date);
                                     } catch (Exception e) {
-                                        d.setLastMsg_date(new Date(0));
+                                        d.setLastMsg_date(-1);
                                     }
 
                                     try {
@@ -859,8 +877,8 @@ public final class TelegClient {
                     TdApi.UpdateUser updateUser = (TdApi.UpdateUser) object;
                     ServerApplication.logger.info("Update Handler UpdateUser");
                     users.put(updateUser.user.id, updateUser.user);
-                    if(flag){
-                        flag=false;
+                    if (flag) {
+                        flag = false;
                         userId = updateUser.user.id;
                     }
                     break;
@@ -1044,6 +1062,12 @@ public final class TelegClient {
                     }
                     break;
                 }
+
+                case TdApi.NotificationTypeNewMessage.CONSTRUCTOR:
+                    TdApi.Message mess = (TdApi.Message) object;
+                    System.out.println("New Message recieved " + mess.toString());
+
+
                 case TdApi.UpdateChatIsMarkedAsUnread.CONSTRUCTOR: {
 //                    ServerApplication.logger.info("Update Handler UpdateChatIsMarkedAsUnread");
                     TdApi.UpdateChatIsMarkedAsUnread update = (TdApi.UpdateChatIsMarkedAsUnread) object;
@@ -1087,6 +1111,12 @@ public final class TelegClient {
                     TdApi.UpdateSupergroupFullInfo updateSupergroupFullInfo = (TdApi.UpdateSupergroupFullInfo) object;
                     supergroupsFullInfo.put(updateSupergroupFullInfo.supergroupId, updateSupergroupFullInfo.supergroupFullInfo);
                     break;
+
+                case TdApi.UpdateNewMessage.CONSTRUCTOR:
+                    ServerApplication.logger.info("TdApi.UpdateNewMessage.CONSTRUCTOR");
+                    TdApi.Message message = ((TdApi.UpdateNewMessage) object).message;
+                    SocketHandler.sendMessageFromTelegram(message, token, getMessageType(message), messRandId);
+
                 default:
                     // print("Unsupported update:" + newLine + object);
             }

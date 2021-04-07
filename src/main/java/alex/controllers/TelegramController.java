@@ -1,9 +1,11 @@
 package alex.controllers;
 
 import alex.ServerApplication;
+import alex.entity.DialogToUser;
 import alex.handlers.TelegClient;
 import alex.model.Dialog;
 import alex.model.TelegramMess;
+import alex.service.DialogToUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.tdlight.common.Init;
@@ -12,10 +14,16 @@ import it.tdlight.jni.TdApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class TelegramController {
+
+//    @Autowired
+//    private ChatService chatService;
 
     @Autowired
     ObjectMapper mapper;
@@ -48,8 +56,10 @@ public class TelegramController {
         try {
             TelegClient client = new TelegClient();
             client.setPhoneNumber(phone);
+            ServerApplication.logger.info("token = " + token);
             clients.put(token, client);
             client.createNewClient(directoryNumber);
+            client.setToken(token);
             directoryNumber++;
         }catch (Exception ex){
             ServerApplication.logger.info("Authorization failed");
@@ -72,6 +82,12 @@ public class TelegramController {
     @GetMapping(value = "/telegram_gci/{mess_id}", produces = "application/json")
     public List<Dialog> telegramGetChatsId(@RequestHeader("Authorization") String token, @PathVariable("mess_id") int mess_id){
         ServerApplication.logger.info("telegram_gci " + mess_id);
+//        List<Dialog> dialogs = clients.get(token).gci();
+//        for (Dialog d:
+//             dialogs) {
+//            chatService.addChat(d.getId(), token, mess_id);
+//        }
+
         return clients.get(token).gci();
     }
 
@@ -115,7 +131,7 @@ public class TelegramController {
             lastMsgText = "недопустимый символ";
         }
 
-        list.add(new TelegramMess(lastMess.id, lastMsgText, new Date(lastMess.date*1000L), clients.get(token).getMessageType(lastMess)));
+        list.add(new TelegramMess(lastMess.id, lastMsgText, lastMess.date, clients.get(token).getMessageType(lastMess)));
 
         System.out.println("Last Message was gotten!");
 
@@ -132,10 +148,28 @@ public class TelegramController {
 
 //            System.out.println("call ");
 //            clients.get(token).getClientId();
-            list.add(new TelegramMess(message.id, text, new Date(message.date*1000L), clients.get(token).getMessageType(message)));
+            list.add(new TelegramMess(message.id, text, message.date, clients.get(token).getMessageType(message)));
 
         }
 
         return list;
     }
+
+    @Autowired
+    DialogToUserService dialogToUserService;
+
+    @GetMapping(value="/test")
+    public void test(/*@RequestHeader("Authorization") String token*/){
+//        DialogToUserService dialogToUserService = new DialogToUserServiceImpl();
+
+        List<DialogToUser> dialogsToUsers = dialogToUserService.getUsersByChatId(817388954);
+
+        for (DialogToUser d:
+             dialogsToUsers) {
+            System.out.println(d.getDialog().getId() + " " + d.getUser().getMsgToken());
+        }
+
+    }
+
+
 }

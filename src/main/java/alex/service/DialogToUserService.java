@@ -1,12 +1,13 @@
 package alex.service;
 
 import alex.entity.DialogToUser;
+
 import java.util.List;
 
 
 public interface DialogToUserService {
     DialogToUser getById(int id);
-    DialogToUser edit(DialogToUser dialogToUser);
     List<DialogToUser> getAll();
-    DialogToUser getByDidUid(int dialogId, int userId);
+    List<DialogToUser> getUsersByChatId(int dialog_id);
+    void saveDialogToUser(DialogToUser dialogToUser);
 }
