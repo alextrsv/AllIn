@@ -1,22 +1,23 @@
 package alex.service;
 
 
+import alex.dto.MessengerDto;
+import alex.dto.Response;
+import alex.entity.Messenger;
 import alex.entity.User;
-
-import java.util.List;
 
 
 public interface UserService {
 
-    User addUser(User user);
-    void delete(int id);
-    void delete(String token);
-    User getByName(String name);
+
+    Response setMsgToken(String token, String msgToken);
+    User addUser(String token, User newUser);
+    Iterable<Messenger> getUsersMess(String token);
+    void addMessenger(String token, String accessToken, MessengerDto messengerDto);
+
+    String delete(String token);
     User getByToken(String token);
     User getById(int id);
-    User editUser(User user);
-    List<User> getAll();
-
-//    void update(User user);
+    Iterable<User> getAll();
 
 }

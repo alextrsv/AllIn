@@ -1,6 +1,6 @@
 package alex.entity;
 
-import alex.service.UserService;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -26,9 +26,12 @@ public class DialogToUser {
     private Collection<Favorites> favorites;
 
 
+    @JsonIgnore
     public Collection<Favorites> getFavorites() {
         return favorites;
     }
+
+
 
     public void setFavorites(Collection<Favorites> favorites) {
         this.favorites = favorites;
@@ -50,6 +53,7 @@ public class DialogToUser {
         this.dialog = dialog;
     }
 
+    @JsonIgnore
     public User getUser() {
         return user;
     }

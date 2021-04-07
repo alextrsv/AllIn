@@ -19,10 +19,6 @@ public class FavoritesServiceImpl implements FavoritesService {
         return favoritesRepository.findById(id).get();
     }
 
-    @Override
-    public Favorites edit(Favorites favorites) {
-        return favoritesRepository.save(favorites);
-    }
 
     @Override
     public List<Favorites> getAll() {
@@ -34,8 +30,4 @@ public class FavoritesServiceImpl implements FavoritesService {
         favoritesRepository.deleteByDialogToUserId(dialogToUserId);
     }
 
-    @Override
-    public void deleteBy2Id(int dialogToUserId, int categoryId) {
-        favoritesRepository.deleteBy2Id(dialogToUserId, categoryId);
-    }
 }

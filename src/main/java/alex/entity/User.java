@@ -1,6 +1,8 @@
 package alex.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Collection;
 
@@ -45,6 +47,7 @@ public class User {
         this.phone = phone;
     }
 
+    @JsonIgnore
     public Collection<DialogToUser> getDialogToUserCollection() {
         return dialogToUserCollection;
     }

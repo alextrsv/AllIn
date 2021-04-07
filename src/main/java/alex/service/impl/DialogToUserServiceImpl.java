@@ -18,10 +18,6 @@ public class DialogToUserServiceImpl implements DialogToUserService {
         return dialogToUserRepository.findById(id).get();
     }
 
-    @Override
-    public DialogToUser edit(DialogToUser dialogToUser) {
-        return dialogToUserRepository.save(dialogToUser);
-    }
 
     @Override
     public List<DialogToUser> getAll() {
@@ -29,7 +25,14 @@ public class DialogToUserServiceImpl implements DialogToUserService {
     }
 
     @Override
-    public DialogToUser getByDidUid(int dialogId, int userId) {
-        return dialogToUserRepository.findByDidUid(dialogId, userId);
+    public List<DialogToUser> getUsersByChatId(int dialog_id) {
+        return (List<DialogToUser>)dialogToUserRepository.findDialogToUsersByDialog_Id(dialog_id);
     }
+
+    @Override
+    public void saveDialogToUser(DialogToUser dialogToUser) {
+        dialogToUserRepository.save(dialogToUser);
+    }
+
+
 }
