@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.net.URL;
 
 @Service
@@ -26,16 +26,32 @@ public class StorageService {
     @Autowired
     private AmazonS3 s3Client;
 
-    public URL uploadFile(MultipartFile file) {
+
+    /**
+     * Загрузка файла, полученного в теле HTTP-запроса в storage. На вход получает файл из тела запроса,
+     * возвращает временную ссылку на файл в storage
+     * @param file - файл из тела запроса
+     */
+    public URL uploadFileFromHttp(MultipartFile file) {
         File fileObj = convertMultiPartFileToFile(file);
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
         s3Client.putObject(new PutObjectRequest(bucketName, fileName, fileObj));
         fileObj.delete();
-//        return "File uploaded : " + fileName;
-//        return s3Client.getUrl(bucketName, fileName);
         return generatePublicUrl(fileName);
     }
 
+
+    /**
+     * Загрузка файла в storage из локальной директории. На вход получает имя файла в локлаьной директории,
+     * возвращает временную ссылку на файл в storage
+     * @param fileName - имя файла в локальной директории
+     */
+    public URL uploadFileFromDir(String fileName) {
+        File file = new File("src\\main\\resources\\imgs\\"+fileName);
+        s3Client.putObject(new PutObjectRequest(bucketName, fileName, file));
+        file.delete();
+        return generatePublicUrl(fileName);
+    }
 
     public byte[] downloadFile(String fileName) {
         S3Object s3Object = s3Client.getObject(bucketName, fileName);
@@ -67,13 +83,11 @@ public class StorageService {
     }
 
     public URL generatePublicUrl(String objectKey){
-        // Set the presigned URL to expire after one hour.
         java.util.Date expiration = new java.util.Date();
         long expTimeMillis = expiration.getTime();
         expTimeMillis += 1000 * 60 * 60;
         expiration.setTime(expTimeMillis);
 
-        // Generate the presigned URL.
         System.out.println("Generating pre-signed URL.");
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
                 new GeneratePresignedUrlRequest(bucketName, objectKey)
@@ -83,4 +97,5 @@ public class StorageService {
 
         return url;
     }
+
 }

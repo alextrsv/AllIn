@@ -1,11 +1,14 @@
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 
 public class Test {
     public static void main(String[] args) {
-        getImg();
+
+//        getImg();
+//        copyTest();
     }
 
     public static byte[] getImg() {
@@ -18,4 +21,19 @@ public class Test {
         }
        return null;
     }
+
+//    public static void copyTest() {
+//        File inputFile = new File("E:\\Pshoo\\PshooCode\\server\\src\\main\\resources\\imgs\\first.jpg");
+//        File outputFile = new File("NEW.jpg");
+//        try (InputStream is = new FileInputStream(inputFile)) {
+//            BufferedImage image = ImageIO.read(is);
+//            try (OutputStream os = new FileOutputStream(outputFile)) {
+//                ImageIO.write(image, "jpg", os);
+//            } catch (Exception exp) {
+//                exp.printStackTrace();
+//            }
+//        } catch (Exception exp) {
+//            exp.printStackTrace();
+//        }
+//    }
 }
