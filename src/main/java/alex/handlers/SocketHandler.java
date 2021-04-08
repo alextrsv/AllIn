@@ -4,6 +4,7 @@ import alex.ServerApplication;
 import alex.controllers.MessageController;
 import alex.controllers.TelegramController;
 import alex.entity.DialogToUser;
+import alex.exceptions.NoSuchUserException;
 import alex.fcm_base.FCMService;
 import alex.model.PushNotificationRequest;
 import alex.service.DialogToUserService;
@@ -279,7 +280,11 @@ public class SocketHandler extends TextWebSocketHandler {
                 ServerApplication.logger.info("userService = null");
             }
 
-            pushNotificationRequest.setToken(userService.getByToken(token).getMsgToken());
+            try {
+                pushNotificationRequest.setToken(userService.getByToken(token).getMsgToken());
+            } catch (NoSuchUserException noSuchUserException) {
+                noSuchUserException.printStackTrace();
+            }
             ServerApplication.logger.info("after pushNotificationRequest");
             pushNotificationRequest.setTitle(token);
             pushNotificationRequest.setMessage(((TdApi.MessageText) message.content).text.text);

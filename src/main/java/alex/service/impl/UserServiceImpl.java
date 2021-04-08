@@ -2,10 +2,11 @@ package alex.service.impl;
 
 import alex.dto.MessengerDto;
 import alex.dto.Response;
-import alex.dto.ResponseStatus;
 import alex.entity.Messenger;
 import alex.entity.User;
 import alex.entity.UsersMessengers;
+import alex.exceptions.MessengerAlreadyOwnedException;
+import alex.exceptions.NoSuchUserException;
 import alex.repository.MessengerRepository;
 import alex.repository.UserRepository;
 import alex.repository.UsersMessengersRepository;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 
 @Service
@@ -36,15 +38,10 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public Response setMsgToken(String token, String msgToken) {
-        try {
-            User user = userRepository.findByToken(token);
-            user.setMsgToken(msgToken);
-            userRepository.save(user);
-        }catch (NullPointerException exeption){
-            return new Response(ResponseStatus.ERROR, "there isn't such user. Check auth token");
-        }
-        return new Response(ResponseStatus.SUCCESS, "msgToken has been set successfully set up");
+    public void setMsgToken(String token, String msgToken) throws NoSuchUserException {
+        User user = getByToken(token);
+        user.setMsgToken(msgToken);
+        userRepository.save(user);
     }
 
     @Override
@@ -53,12 +50,12 @@ public class UserServiceImpl implements UserService {
             newUser.setToken(token);
             return userRepository.save(newUser);
         }
-        else return userRepository.findByToken(token);
+        else return userRepository.findByToken(token); // уже есть - возвращается профиль
     }
 
     @Override
-    public Iterable<Messenger> getUsersMess(String token) {
-        User user = userRepository.findByToken(token);
+    public Iterable<Messenger> getUsersMess(String token) throws NoSuchUserException {
+        User user = getByToken(token);
         Collection<Messenger> usrMessengers = commonService.getUsersMessengers(user);
         Iterable<Messenger> allMessengers = messengerRepository.findAll();
         for (Messenger mess : allMessengers) {
@@ -68,9 +65,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addMessenger(String token, String accessToken, MessengerDto messengerDto) {
-        User user = userRepository.findByToken(token);
+    public void addMessenger(String token, String accessToken, MessengerDto messengerDto)
+            throws NoSuchElementException, MessengerAlreadyOwnedException, NoSuchUserException {
+
+        User user = getByToken(token);
+
         Messenger messenger = messengerRepository.findById(messengerDto.getId()).get();
+
+        if (commonService.getUsersMessengers(user).contains(messenger))
+            throw new MessengerAlreadyOwnedException(messenger.getTitle(), token);
+
         UsersMessengers newUsersMessengers = new UsersMessengers();
 
         newUsersMessengers.setUser(user);
@@ -83,15 +87,16 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public String delete(String token) {
+    public void delete(String token) throws NullPointerException, NoSuchUserException {
         usersMessengersRepository.deleteByUserId(getByToken(token).getId());
         userRepository.deleteByToken(token);
-        return "redirect:/users";
     }
 
     @Override
-    public User getByToken(String token) {
-        return userRepository.findByToken(token);
+    public User getByToken(String token) throws NoSuchUserException {
+        User user = userRepository.findByToken(token);
+        if (user == null) throw new NoSuchUserException(token);
+        return user;
     }
 
     @Override

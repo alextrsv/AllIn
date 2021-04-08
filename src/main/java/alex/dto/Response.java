@@ -1,33 +1,30 @@
 package alex.dto;
 
+import org.springframework.http.HttpStatus;
+
 public class Response {
 
-    ResponseStatus status;
-    String comment;
+    private String message;
+    private HttpStatus status;
 
-
-
-    public Response(){}
-
-    public Response(ResponseStatus status, String comment){
-        this.status = status;
-        this.comment = comment;
+    public Response() {
     }
 
-
-    public String getComment() {
-        return comment;
+    public Response(String message) {
+        this.message = message;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public ResponseStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ResponseStatus status) {
+    public Response(String message, HttpStatus status) {
+        this.message = message;
         this.status = status;
     }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
 }

@@ -2,17 +2,20 @@ package alex.service.impl;
 
 import alex.dto.DialogCategoryHolder;
 import alex.dto.Response;
-import alex.dto.ResponseStatus;
 import alex.entity.*;
+import alex.exceptions.NoSuchDialogException;
+import alex.exceptions.NoSuchMesengerOwnedException;
 import alex.repository.*;
 import alex.service.CommonService;
 import alex.service.DialogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class DialogServiceImpl implements DialogService {
@@ -40,7 +43,8 @@ public class DialogServiceImpl implements DialogService {
 
 
     @Override
-    public Response createDialog(int messId, String token, User userTo) {
+    public Response createDialog(int messId, String token, User userTo) throws NoSuchMesengerOwnedException,
+            NoSuchMessageException {
 
         User userFrom = userRepository.findByToken(token);
         userTo = userRepository.findById(userTo.getId()).get();
@@ -50,15 +54,14 @@ public class DialogServiceImpl implements DialogService {
 
         Messenger currentMessenger = messengerRepository.findById(messId).get();
 
-        if (!messengersOfUserFrom.contains(currentMessenger))
-            return new Response(ResponseStatus.ERROR, "This user do not have such messenger");
+        if (!messengersOfUserFrom.contains(currentMessenger)) throw new NoSuchMesengerOwnedException(messId, token);
         else if (messengersOfUserFrom.contains(currentMessenger) && !messengersOfUserTo.contains(currentMessenger))
-            return new Response(ResponseStatus.ERROR, "You sobesednik do not have such messenger");
+            throw new NoSuchMesengerOwnedException(messId, userTo.getToken());
         else {
             Dialog dialog = new Dialog();
-            dialog.setIcon("Icon2");
+            dialog.setIcon("Icon3");
             dialog.setNote("testing http dialog adding");
-            dialog.setTitle("DIALOG2");
+            dialog.setTitle("DIALOG3");
             dialog.setMessenger(messengerRepository.findById(messId).get());
 
             DialogToUser dialogToUserFrom = new DialogToUser();
@@ -73,14 +76,18 @@ public class DialogServiceImpl implements DialogService {
             dialogRepository.save(dialog);
             dialogToUserRepository.save(dialogToUserFrom);
             dialogToUserRepository.save(dialogToUserTo);
-            return new Response(ResponseStatus.SUCCESS, "New dialog has been created");
+            return new Response("New dialog has been created");
 
         }
     }
 
     @Override
-    public Dialog getById(int id) {
-        return dialogRepository.findById(id).get();
+    public Dialog getById(int id) throws NoSuchDialogException {
+        try {
+            return dialogRepository.findById(id).get();
+        }catch (NoSuchElementException exception){
+            throw new NoSuchDialogException(id);
+        }
     }
 
     @Override
@@ -95,11 +102,11 @@ public class DialogServiceImpl implements DialogService {
             Dialog dialog = dialogRepository.findById(dg.getId()).get();
             DialogToUser dialogToUser = dialogToUserRepository.findByDidUid(dialog.getId(), user.getId());
             if (dialogToUser == null)
-                return new Response(ResponseStatus.ERROR, "у пользователя нет диалога c id = " + dialog.getId());
+                return new Response("у пользователя нет диалога c id = " + dialog.getId());
             for (Category ct : categories) {
                 Category category = categoryRepository.findById(ct.getId()).get();
                 if (category.getUser().getId() != user.getId())
-                    return new Response(ResponseStatus.ERROR, "у пользователя нет категории c id = " + category.getId());
+                    return new Response("у пользователя нет категории c id = " + category.getId());
                 Favorites favorites = new Favorites();
 
                 favorites.setDialogToUser(dialogToUser);
@@ -108,7 +115,7 @@ public class DialogServiceImpl implements DialogService {
                 favoritesRepository.save(favorites);
             }
         }
-        return new Response(ResponseStatus.SUCCESS, "all dialogs have been added to all categories");
+        return new Response("all dialogs have been added to all categories");
     }
 
 
@@ -133,7 +140,7 @@ public class DialogServiceImpl implements DialogService {
             }
         }
 
-        return new Response(ResponseStatus.SUCCESS, "dialogs have been deleted from categories");
+        return new Response("dialogs have been deleted from categories");
     }
 
     @Override

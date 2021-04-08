@@ -1,6 +1,5 @@
 package alex.controllers;
 
-import alex.ServerApplication;
 import alex.entity.Messenger;
 import alex.service.MessengerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ public class MessengerController {
     public Iterable<Messenger> allUsers(Model model) {
         Iterable<Messenger> messengers = messengerService.getAll();
 
-        ServerApplication.logger.info(messengers.toString());
         return messengers;
     }
 }
