@@ -2,14 +2,14 @@ package alex.controllers;
 
 import alex.dto.DialogCategoryHolder;
 import alex.dto.Response;
-import alex.dto.ResponseStatus;
-import alex.entity.*;
-import alex.service.*;
+import alex.entity.Category;
+import alex.entity.Dialog;
+import alex.entity.User;
+import alex.service.DialogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -23,7 +23,7 @@ public class DialogController {
     private Dialog getDialog(@PathVariable(name = "id") int id){
         return dialogService.getById(id);
     }
- 
+
 
     @PostMapping("dialog/add/{id}")
     @ResponseBody
@@ -35,15 +35,15 @@ public class DialogController {
     @PostMapping("/dialogsToCategories")
     @ResponseBody
     private Response addDialogsToCategories(@RequestHeader("Authorization") String token,
-                                       @RequestBody DialogCategoryHolder dialogCategoryHolder){
+                                            @RequestBody DialogCategoryHolder dialogCategoryHolder){
         return dialogService.addDialogsToCategories(token, dialogCategoryHolder);
     }
 
     @PostMapping("/favorites/dialogs/delete")
     @ResponseBody
     private Response deleteFromCategories(@RequestHeader("Authorization") String token,
-                                        @RequestHeader("deleteFromFavourites") boolean deleteFromFavourites,
-                                        @RequestBody DialogCategoryHolder dialogCategoryHolder){
+                                          @RequestHeader("deleteFromFavourites") boolean deleteFromFavourites,
+                                          @RequestBody DialogCategoryHolder dialogCategoryHolder){
         return dialogService.deleteFromCategories(token, deleteFromFavourites, dialogCategoryHolder);
     }
 
@@ -51,10 +51,8 @@ public class DialogController {
     @PostMapping("/getFavorites")
     @ResponseBody
     private List<Dialog> getFavDialogs(@RequestHeader("Authorization") String token,
-                                 @RequestBody Category categoryTr){
+                                       @RequestBody Category categoryTr){
         return dialogService.getFavoriteDialogs(token, categoryTr);
     }
 
 }
-
-

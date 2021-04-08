@@ -6,24 +6,16 @@ import alex.dto.ResponseStatus;
 import alex.entity.Category;
 import alex.entity.Messenger;
 import alex.entity.User;
-import alex.entity.UsersMessengers;
-import alex.repository.UserRepository;
-import alex.repository.UsersMessengersRepository;
 import alex.service.CategoryService;
 import alex.service.MessengerService;
 import alex.service.UserService;
-import alex.service.UsersMessengersService;
-import com.google.j2objc.annotations.AutoreleasePool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Controller
@@ -84,7 +76,7 @@ public class UserController {
     public Iterable<Messenger> getUsersMess(@RequestHeader("Authorization") String token, HttpServletResponse response) {
         try {
             return userService.getUsersMess(token);
-        }catch (java.lang.NullPointerException nullPointerException){
+        }catch (NullPointerException nullPointerException){
             try {
                 response.sendRedirect("/users/no-user-error");
             } catch (IOException e) {
@@ -98,7 +90,7 @@ public class UserController {
     @PostMapping("/messengers/add")
     public String addMessenger(@RequestHeader("Authorization") String token, @RequestHeader("accessToken") String accessToken, @RequestBody MessengerDto mess) {
         try {
-           userService.addMessenger(token, accessToken, mess);
+            userService.addMessenger(token, accessToken, mess);
         }catch (RuntimeException e) {
             Throwable rootCause = com.google.common.base.Throwables.getRootCause(e);
             if (rootCause instanceof SQLException) {
@@ -131,7 +123,7 @@ public class UserController {
     @PostMapping("/messengers/change-pos")
     @ResponseBody
     public Response changePosition(@RequestHeader("Authorization") String token,
-                                 @RequestBody MessengerDto infMessenger){
+                                   @RequestBody MessengerDto infMessenger){
 
         return messengerService.changePosition(token, infMessenger);
     }
@@ -152,7 +144,7 @@ public class UserController {
     public Category createCategory(@RequestHeader("Authorization") String token,
                                    @RequestBody Category dtoCategory){
 
-       return categoryService.createCategory(token, dtoCategory);
+        return categoryService.createCategory(token, dtoCategory);
     }
 
     @DeleteMapping("/categories/{id}/delete")
@@ -165,16 +157,16 @@ public class UserController {
     @ResponseBody
     public Category updateCategory(@RequestHeader("Authorization") String token, @RequestBody Category infCategory){
 
-      return categoryService.update(token, infCategory);
+        return categoryService.update(token, infCategory);
     }
 
 
     @GetMapping("/status")
     @ResponseBody
     private Response getStatus(){
-     Response response = new Response();
-     response.setStatus(ResponseStatus.SUCCESS);
-     response.setComment("действие было сделано");
+        Response response = new Response();
+        response.setStatus(ResponseStatus.SUCCESS);
+        response.setComment("действие было сделано");
         return response;
     }
 

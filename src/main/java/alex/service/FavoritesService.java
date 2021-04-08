@@ -1,8 +1,6 @@
 package alex.service;
 
-import alex.entity.Dialog;
 import alex.entity.Favorites;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 

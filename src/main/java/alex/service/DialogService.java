@@ -2,12 +2,10 @@ package alex.service;
 
 import alex.dto.DialogCategoryHolder;
 import alex.dto.Response;
-import alex.dto.ResponseStatus;
-import alex.entity.*;
-import alex.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import alex.entity.Category;
+import alex.entity.Dialog;
+import alex.entity.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface DialogService {

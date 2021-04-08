@@ -2,9 +2,6 @@ package alex.service;
 
 import alex.dto.Response;
 import alex.entity.Category;
-import alex.entity.User;
-
-import java.util.Optional;
 
 public interface CategoryService {
 

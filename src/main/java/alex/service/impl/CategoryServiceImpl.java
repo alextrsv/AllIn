@@ -2,7 +2,8 @@ package alex.service.impl;
 
 import alex.dto.Response;
 import alex.dto.ResponseStatus;
-import alex.entity.*;
+import alex.entity.Category;
+import alex.entity.User;
 import alex.repository.CategoryRepository;
 import alex.repository.UserRepository;
 import alex.service.CategoryService;

@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
             User user = userRepository.findByToken(token);
             user.setMsgToken(msgToken);
             userRepository.save(user);
-        }catch (java.lang.NullPointerException exeption){
+        }catch (NullPointerException exeption){
             return new Response(ResponseStatus.ERROR, "there isn't such user. Check auth token");
         }
         return new Response(ResponseStatus.SUCCESS, "msgToken has been set successfully set up");

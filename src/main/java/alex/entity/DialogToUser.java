@@ -1,8 +1,6 @@
 package alex.entity;
 
-import alex.service.UserService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -32,6 +30,8 @@ public class DialogToUser {
     public Collection<Favorites> getFavorites() {
         return favorites;
     }
+
+
 
     public void setFavorites(Collection<Favorites> favorites) {
         this.favorites = favorites;

@@ -16,13 +16,12 @@ public class CommonService {
     @Autowired
     MessengerRepository messengerRepository;
 
-    public List<Messenger> getUsersMessengers(User user){
+    public  List<Messenger> getUsersMessengers(User user){
 
         List<Messenger> messengersOfUser = new ArrayList<Messenger>();
 
         for (UsersMessengers useMes: user.getUsMes()) {
             messengersOfUser.add(useMes.getMessenger());
-            useMes.getMessenger().setPosition(useMes.getPosition());
         }
         Iterable<Messenger> allMessengers = messengerRepository.findAll();
         for (Messenger mess : allMessengers) {
