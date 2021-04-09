@@ -7,7 +7,9 @@ import alex.model.Dialog;
 import alex.model.TelegramMess;
 //import alex.service.ChatService;
 import alex.service.DialogToUserService;
+import alex.service.UserService;
 import alex.service.impl.DialogToUserServiceImpl;
+import alex.service.impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.tdlight.common.Init;
@@ -100,6 +102,12 @@ public class TelegramController {
     @GetMapping(value = "/telegram_history/{mess_id}/{chat_id}", produces = "application/json")
     @ResponseBody
     public List<TelegramMess> telegramGetChatHistory(@RequestHeader("Authorization") String token, @PathVariable("chat_id") long chatId){
+        UserService userService = new UserServiceImpl();
+        try{
+            System.out.println("token = " + userService.getByToken("A4ChcdEfxEUOwYCnosc0QPXXKyE3"));
+        }catch (Exception e){
+            ServerApplication.logger.error(e.getMessage());
+        }
 
         List<TelegramMess> list = new ArrayList<>();
         String lastMsgText = "";
@@ -111,21 +119,16 @@ public class TelegramController {
         }
 
         list.add(new TelegramMess(lastMess.id, lastMsgText, lastMess.date, clients.get(token).getMessageType(lastMess)));
+        ServerApplication.logger.info("size = " + list.size() + "lastMsgText = " + lastMsgText);
 
         System.out.println("Last Message was gotten!");
 
         TdApi.Message[] messages = clients.get(token).getHistoryFromChat(chatId, 0, 50);
         System.out.println("messages were gotten");
-        boolean flag = true;
         for (TdApi.Message message:
                 messages) {
 
-            ServerApplication.logger.info(((TdApi.MessageText) message.content).text.text);
-
-            if(flag){
-                flag = false;
-                continue;
-            }
+            ServerApplication.logger.info(message.toString());
 
             String text = "";
             try {
@@ -138,6 +141,7 @@ public class TelegramController {
 
         }
 
+        ServerApplication.logger.info("end size = " + list.size());
         return list;
     }
 

@@ -130,12 +130,12 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!--		<dependency>-->
-		<!--			<groupId>it.tdlight</groupId>-->
-		<!--			<artifactId>tdlight-natives-windows-amd64</artifactId>-->
-		<!--			<version>3.2.54</version>-->
-		<!--			<optional>true</optional>-->
-		<!--		</dependency>-->
+<!--				<dependency>-->
+<!--					<groupId>it.tdlight</groupId>-->
+<!--					<artifactId>tdlight-natives-windows-amd64</artifactId>-->
+<!--					<version>3.2.54</version>-->
+<!--					<optional>true</optional>-->
+<!--				</dependency>-->
 
 		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
 		<dependency>
