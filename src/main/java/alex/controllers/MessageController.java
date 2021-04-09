@@ -36,6 +36,4 @@ public class MessageController {
         return "{'status' : 'ERROR'}";
 //        return  "ERROR";
     }
-
-
 }

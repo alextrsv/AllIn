@@ -118,12 +118,12 @@ public class UserController {
     }
 
 
-    @PostMapping("/msg-token")
+    @PostMapping("/push-token")
     @ResponseBody
     private Response setMsgToken(@RequestHeader("Authorization") String token,
-                                 @RequestHeader(name = "msgToken") String msgToken){
+                                 @RequestHeader(name = "PushToken") String pushToken){
 
-        return userService.setMsgToken(token, msgToken);
+        return userService.setMsgToken(token, pushToken);
     }
 
     /////////////////////////PART_________2

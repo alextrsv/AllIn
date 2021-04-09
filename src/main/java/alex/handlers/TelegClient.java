@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class TelegClient {
 
-    private final UserService userService = new UserServiceImpl();
+    public UserService userService;
 
     private TelegramClient client = null;
     private String phoneNumber = "";
@@ -1131,6 +1131,19 @@ public final class TelegClient {
 
                     if(userService == null){
                         ServerApplication.logger.info("userService = null");
+                    }else{
+                        String token1 = userService.getByToken(token).getMsgToken();
+                        ServerApplication.logger.info("token1 = " + token1);
+                    }
+
+                    UserService userService2 = new UserServiceImpl();
+
+                    try{
+                        String token2 = userService2.getByToken(token).getMsgToken();
+                        ServerApplication.logger.info("token2 = " + token2);
+
+                    }catch (Exception e){
+                        ServerApplication.logger.error(e.getMessage());
                     }
 
                     if(out && messRandId > 0) {

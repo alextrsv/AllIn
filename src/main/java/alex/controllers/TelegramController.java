@@ -23,8 +23,8 @@ import java.util.*;
 @RestController
 public class TelegramController {
 
-//    @Autowired
-//    private ChatService chatService;
+    @Autowired
+    private UserService userService;
 
     @Autowired
     ObjectMapper mapper;
@@ -61,6 +61,11 @@ public class TelegramController {
             clients.put(token, client);
             client.createNewClient(directoryNumber);
             client.setToken(token);
+
+            //DELETE
+            client.userService = userService;
+
+
             directoryNumber++;
         }catch (Exception ex){
             ServerApplication.logger.info("Authorization failed");
@@ -147,6 +152,8 @@ public class TelegramController {
 
     @Autowired
     DialogToUserService dialogToUserService;
+
+
 
     @GetMapping(value="/test")
     public void test(/*@RequestHeader("Authorization") String token*/){
