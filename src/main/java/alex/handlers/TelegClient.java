@@ -1129,25 +1129,15 @@ public final class TelegClient {
                     TdApi.Message message = ((TdApi.UpdateNewMessage) object).message;
                     boolean out = message.isOutgoing;
 
-                    if(userService == null){
-                        ServerApplication.logger.info("userService = null");
-                    }else{
-                        String token1 = userService.getByToken(token).getMsgToken();
-                        ServerApplication.logger.info("token1 = " + token1);
-                    }
-
-                    UserService userService2 = new UserServiceImpl();
-
-                    try{
-                        String token2 = userService2.getByToken(token).getMsgToken();
-                        ServerApplication.logger.info("token2 = " + token2);
-
-                    }catch (Exception e){
-                        ServerApplication.logger.error(e.getMessage());
-                    }
+//                    if(userService == null){
+//                        ServerApplication.logger.info("userService = null");
+//                    }else{
+//                        String token1 = userService.getByToken(token).getMsgToken();
+//                        ServerApplication.logger.info("token1 = " + token1);
+//                    }
 
                     if(out && messRandId > 0) {
-                        SocketHandler.sendMessageFromTelegram(message, token, "out", messRandId, userService.getByToken(token).getMsgToken());
+//                        SocketHandler.sendMessageFromTelegram(message, token, "out", messRandId, userService.getByToken(token).getMsgToken());
                         messRandId = 0;
                     }else{
                         SocketHandler.sendMessageFromTelegram(message, token, getMessageType(message), 0l, userService.getByToken(token).getMsgToken());

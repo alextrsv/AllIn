@@ -92,7 +92,7 @@ public class SocketHandler extends TextWebSocketHandler {
         }
     }
 
-    public static void sendMessageFromTelegram(TdApi.Message message, String token, String messageType, Long messRandId, String msgToken) {
+    public static int sendMessageFromTelegram(TdApi.Message message, String token, String messageType, Long messRandId, String msgToken) {
         ServerApplication.logger.info("void sendMessageFromTelegram New Message was gotten");
         ServerApplication.logger.info("token = " + token + " messageType = " + messageType);
         JSONObject object = new JSONObject();
@@ -106,9 +106,6 @@ public class SocketHandler extends TextWebSocketHandler {
 //
 //        for (DialogToUser d :
 //                dialogsToUsers) {
-//            if (messRandId > 0 && messageType.equals("out")) {
-//                continue;
-//            }
 //
 //            if (d.getDialog().getMessenger().getId() != 1) {
 //                continue;
@@ -116,10 +113,17 @@ public class SocketHandler extends TextWebSocketHandler {
 
             //Написать распределение по out/in для каждого пользователя
 
+
+
+//            if (messRandId > 0 && messageType.equals("out")) {
+//                return -1;
+//            }
+
             try {
                 //Пытаемся отправить сообщение отправителю в сессию
                 //Отправится при условии, что получатель сидит в диалоге
 //                sessions.get(d.getUser().getToken()).sendMessage(new TextMessage(object.toString()));
+                ServerApplication.logger.info("before sessions.get");
                 sessions.get(token).sendMessage(new TextMessage(object.toString()));
 
             } catch (Exception e) {
@@ -155,6 +159,8 @@ public class SocketHandler extends TextWebSocketHandler {
                     logger.error(executionException.getMessage());
                 }
             }
+
+            return 0;
 //        }
     }
 
