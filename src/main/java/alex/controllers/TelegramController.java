@@ -1,15 +1,10 @@
 package alex.controllers;
 
 import alex.ServerApplication;
-import alex.entity.DialogToUser;
 import alex.handlers.TelegClient;
 import alex.model.Dialog;
 import alex.model.TelegramMess;
-//import alex.service.ChatService;
-import alex.service.DialogToUserService;
 import alex.service.UserService;
-import alex.service.impl.DialogToUserServiceImpl;
-import alex.service.impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.tdlight.common.Init;
@@ -107,13 +102,6 @@ public class TelegramController {
     @GetMapping(value = "/telegram_history/{mess_id}/{chat_id}", produces = "application/json")
     @ResponseBody
     public List<TelegramMess> telegramGetChatHistory(@RequestHeader("Authorization") String token, @PathVariable("chat_id") long chatId){
-        UserService userService = new UserServiceImpl();
-        try{
-            System.out.println("token = " + userService.getByToken("A4ChcdEfxEUOwYCnosc0QPXXKyE3"));
-        }catch (Exception e){
-            ServerApplication.logger.error(e.getMessage());
-        }
-
         List<TelegramMess> list = new ArrayList<>();
         String lastMsgText = "";
         TdApi.Message lastMess = clients.get(token).getHistoryFromChat(chatId, 0, 1)[0];
@@ -149,24 +137,5 @@ public class TelegramController {
         ServerApplication.logger.info("end size = " + list.size());
         return list;
     }
-
-    @Autowired
-    DialogToUserService dialogToUserService;
-
-
-
-    @GetMapping(value="/test")
-    public void test(/*@RequestHeader("Authorization") String token*/){
-//        DialogToUserService dialogToUserService = new DialogToUserServiceImpl();
-
-        List<DialogToUser> dialogsToUsers = dialogToUserService.getUsersByChatId(817388954);
-
-        for (DialogToUser d:
-             dialogsToUsers) {
-            System.out.println(d.getDialog().getId() + " " + d.getUser().getMsgToken());
-        }
-
-    }
-
 
 }

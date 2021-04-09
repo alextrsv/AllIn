@@ -766,23 +766,6 @@ public final class TelegClient {
                 gciLock.unlock();
             }
             ServerApplication.logger.info("after gciLock.lock()");
-
-//            ServerApplication.logger.info("after send");
-//            // have enough chats in the chat list to answer request
-//            java.util.Iterator<OrderedChat> iter = mainChatList.iterator();
-//            Map<Long, String> map = new HashMap<>();
-////            ServerApplication.logger.info();
-//            ServerApplication.logger.info("First " + limit + " chat(s) out of " + mainChatList.size() + " known chat(s):");
-//            for (int i = 0; i < limit && iter.hasNext(); i++) {
-//                long chatId = iter.next().chatId;
-//                TdApi.Chat chat = chats.get(chatId);
-//                synchronized (chat) {
-//                    map.put(chatId, chat.title);
-////                    ServerApplication.logger.info(chatId + ": " + chat.title);
-//                }
-//            }
-//            return map;
-//            print("");
         }
     }
 
@@ -1146,7 +1129,7 @@ public final class TelegClient {
 //                        SocketHandler.sendMessageFromTelegram(message, token, "out", messRandId, userService.getByToken(token).getMsgToken());
                         messRandId = 0;
                     }else{
-                        SocketHandler.sendMessageFromTelegram(message, token, getMessageType(message), 0l, userService.getByToken(token).getMsgToken());
+                        SocketHandler.sendMessageFromTelegram(message, token, getMessageType(message), userService.getByToken(token).getMsgToken());
                     }
 
                 default:

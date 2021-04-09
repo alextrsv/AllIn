@@ -92,24 +92,19 @@ public class SocketHandler extends TextWebSocketHandler {
         }
     }
 
-    public static int sendMessageFromTelegram(TdApi.Message message, String token, String messageType, Long messRandId, String msgToken) {
+    public static void sendMessageFromTelegram(TdApi.Message message, String token, String messageType, String msgToken) {
         ServerApplication.logger.info("void sendMessageFromTelegram New Message was gotten");
         ServerApplication.logger.info("token = " + token + " messageType = " + messageType);
         JSONObject object = new JSONObject();
-        object.put("mess_rand_id", messRandId);
+//        object.put("mess_rand_id", messRandId);
         object.put("mess_api_id", message.id);
         object.put("mess_text", ((TdApi.MessageText) message.content).text.text);
         object.put("mess_time", message.date);
         object.put("mess_direct", messageType);
 
-//            if (messRandId > 0 && messageType.equals("out")) {
-//                return -1;
-//            }
-
         try {
             //Пытаемся отправить сообщение отправителю в сессию
             //Отправится при условии, что получатель сидит в диалоге
-//                sessions.get(d.getUser().getToken()).sendMessage(new TextMessage(object.toString()));
             ServerApplication.logger.info("before sessions.get");
             sessions.get(token).sendMessage(new TextMessage(object.toString()));
 
@@ -146,8 +141,6 @@ public class SocketHandler extends TextWebSocketHandler {
                 logger.error(executionException.getMessage());
             }
         }
-
-        return 0;
     }
 
 
