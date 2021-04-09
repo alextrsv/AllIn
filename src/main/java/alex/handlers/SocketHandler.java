@@ -78,7 +78,7 @@ public class SocketHandler extends TextWebSocketHandler {
                 //mess_rand_id != -1 AND type = out
                 try {
                     session.sendMessage(new TextMessage(object.toString()));
-                }catch (Exception e){
+                } catch (Exception e) {
                     logger.info("Can't send message to sender");
                 }
 
@@ -102,66 +102,52 @@ public class SocketHandler extends TextWebSocketHandler {
         object.put("mess_time", message.date);
         object.put("mess_direct", messageType);
 
-//        List<DialogToUser> dialogsToUsers = dialogToUserService.getUsersByChatId(Integer.parseInt(message.id));
-//
-//        for (DialogToUser d :
-//                dialogsToUsers) {
-//
-//            if (d.getDialog().getMessenger().getId() != 1) {
-//                continue;
-//            }
-
-            //Написать распределение по out/in для каждого пользователя
-
-
-
 //            if (messRandId > 0 && messageType.equals("out")) {
 //                return -1;
 //            }
 
-            try {
-                //Пытаемся отправить сообщение отправителю в сессию
-                //Отправится при условии, что получатель сидит в диалоге
+        try {
+            //Пытаемся отправить сообщение отправителю в сессию
+            //Отправится при условии, что получатель сидит в диалоге
 //                sessions.get(d.getUser().getToken()).sendMessage(new TextMessage(object.toString()));
-                ServerApplication.logger.info("before sessions.get");
-                sessions.get(token).sendMessage(new TextMessage(object.toString()));
+            ServerApplication.logger.info("before sessions.get");
+            sessions.get(token).sendMessage(new TextMessage(object.toString()));
 
-            } catch (Exception e) {
-                ServerApplication.logger.info("push notification");
+        } catch (Exception e) {
+            ServerApplication.logger.info("push notification");
 
-                String singleUseToken = generateSingleUseToken(16);
-                logger.info("singleUseToken = " + singleUseToken);
-                logger.info("senderId = " + token);
-                MessageController.tokens.put(singleUseToken, token);
+            String singleUseToken = generateSingleUseToken(16);
+            logger.info("singleUseToken = " + singleUseToken);
+            logger.info("senderId = " + token);
+            MessageController.tokens.put(singleUseToken, token);
 
-                Map<String, String> map = new HashMap<>();
-                map.put("notification_token", singleUseToken);
-                map.put("chat_id", message.id + "");
-                map.put("messenger_id", "1");
+            Map<String, String> map = new HashMap<>();
+            map.put("notification_token", singleUseToken);
+            map.put("chat_id", message.id + "");
+            map.put("messenger_id", "1");
 
-                PushNotificationRequest pushNotificationRequest = new PushNotificationRequest();
+            PushNotificationRequest pushNotificationRequest = new PushNotificationRequest();
 
-                //Все параметры берутся из бд
-                ///ПРОБЛЕМА
-                pushNotificationRequest.setToken(msgToken);
-                pushNotificationRequest.setTitle(token);
-                pushNotificationRequest.setMessage(((TdApi.MessageText) message.content).text.text);
-                pushNotificationRequest.setMap(map);
+            //Все параметры берутся из бд
+            ///ПРОБЛЕМА
+            pushNotificationRequest.setToken(msgToken);
+            pushNotificationRequest.setTitle(token);
+            pushNotificationRequest.setMessage(((TdApi.MessageText) message.content).text.text);
+            pushNotificationRequest.setMap(map);
 
 //            PushNotificationService pushNotificationService = new PushNotificationService(new FCMService());
-                FCMService service = new FCMService();
-                logger.info("bool = " + service);
+            FCMService service = new FCMService();
+            logger.info("bool = " + service);
 
-                try {
-                    service.sendMessageToToken(pushNotificationRequest);
-                } catch (ExecutionException | InterruptedException executionException) {
-                    logger.info("Execptioooooon");
-                    logger.error(executionException.getMessage());
-                }
+            try {
+                service.sendMessageToToken(pushNotificationRequest);
+            } catch (ExecutionException | InterruptedException executionException) {
+                logger.info("Execptioooooon");
+                logger.error(executionException.getMessage());
             }
+        }
 
-            return 0;
-//        }
+        return 0;
     }
 
 

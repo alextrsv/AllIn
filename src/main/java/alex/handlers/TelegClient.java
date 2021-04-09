@@ -154,28 +154,35 @@ public final class TelegClient {
 //        return userId;
 //    }
 
-    public String getMessageType(TdApi.Message message) {
-        int messageUserId = 0;
-//        int userId = getClientId();
-        boolean isChat = false;
-//        ServerApplication.logger.info(userId + " " + messageUserId);
+//    public String getMessageType(TdApi.Message message) {
+//        int messageUserId = 0;
+////        int userId = getClientId();
+//        boolean isChat = false;
+////        ServerApplication.logger.info(userId + " " + messageUserId);
+//
+//        switch (message.sender.getConstructor()) {
+//            case TdApi.MessageSenderChat.CONSTRUCTOR:
+//                isChat = true;
+//                break;
+//
+//            case TdApi.MessageSenderUser.CONSTRUCTOR:
+//                messageUserId = ((TdApi.MessageSenderUser) message.sender).userId;
+//                break;
+//            default:
+//        }
+//        String type = "in";
+//        if (!isChat && messageUserId == userId) {
+//            type = "out";
+//        }
+//
+//        return type;
+//    }
 
-        switch (message.sender.getConstructor()) {
-            case TdApi.MessageSenderChat.CONSTRUCTOR:
-                isChat = true;
-                break;
-
-            case TdApi.MessageSenderUser.CONSTRUCTOR:
-                messageUserId = ((TdApi.MessageSenderUser) message.sender).userId;
-                break;
-            default:
+    public String getMessageType(TdApi.Message message){
+        if(message.isOutgoing){
+            return "out";
         }
-        String type = "in";
-        if (!isChat && messageUserId == userId) {
-            type = "out";
-        }
-
-        return type;
+        return "in";
     }
 
     public void setPhoneNumber(String phoneNumber) {
@@ -1127,7 +1134,6 @@ public final class TelegClient {
                 case TdApi.UpdateNewMessage.CONSTRUCTOR:
                     ServerApplication.logger.info("TdApi.UpdateNewMessage.CONSTRUCTOR");
                     TdApi.Message message = ((TdApi.UpdateNewMessage) object).message;
-                    boolean out = message.isOutgoing;
 
 //                    if(userService == null){
 //                        ServerApplication.logger.info("userService = null");
@@ -1136,7 +1142,7 @@ public final class TelegClient {
 //                        ServerApplication.logger.info("token1 = " + token1);
 //                    }
 
-                    if(out && messRandId > 0) {
+                    if(message.isOutgoing && messRandId > 0) {
 //                        SocketHandler.sendMessageFromTelegram(message, token, "out", messRandId, userService.getByToken(token).getMsgToken());
                         messRandId = 0;
                     }else{
