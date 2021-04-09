@@ -158,7 +158,7 @@ public final class TelegClient {
         int messageUserId = 0;
 //        int userId = getClientId();
         boolean isChat = false;
-        ServerApplication.logger.info(userId + " " + messageUserId);
+//        ServerApplication.logger.info(userId + " " + messageUserId);
 
         switch (message.sender.getConstructor()) {
             case TdApi.MessageSenderChat.CONSTRUCTOR:

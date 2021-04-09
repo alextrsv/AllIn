@@ -120,6 +120,8 @@ public class TelegramController {
         for (TdApi.Message message:
                 messages) {
 
+            ServerApplication.logger.info(((TdApi.MessageText) message.content).text.text);
+
             if(flag){
                 flag = false;
                 continue;
