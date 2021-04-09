@@ -100,26 +100,6 @@ public class TelegramController {
     @GetMapping(value = "/telegram_history/{mess_id}/{chat_id}", produces = "application/json")
     @ResponseBody
     public List<TelegramMess> telegramGetChatHistory(@RequestHeader("Authorization") String token, @PathVariable("chat_id") long chatId){
-//        TdApi.Message[] messages = clients.get(token).getHistoryFromChat(chatId, 0, 50);
-//
-//        System.out.println("messages were got");
-//        List<TelegramMess> list = new ArrayList<>();
-//        for (TdApi.Message message:
-//                messages) {
-//
-//            String text = "";
-//            try {
-//                text = ((TdApi.MessageText) message.content).text.text;
-//            }catch(ClassCastException ex){
-//                text = "недопустимый символ";
-//            }
-//
-////            System.out.println("call ");
-////            clients.get(token).getClientId();
-//            list.add(new TelegramMess(message.id, text, new Date(message.date*1000L), clients.get(token).getMessageType(message)));
-//        }
-//
-//        return list;
 
         List<TelegramMess> list = new ArrayList<>();
         String lastMsgText = "";
@@ -136,8 +116,15 @@ public class TelegramController {
 
         TdApi.Message[] messages = clients.get(token).getHistoryFromChat(chatId, 0, 50);
         System.out.println("messages were gotten");
+        boolean flag = true;
         for (TdApi.Message message:
                 messages) {
+
+            if(flag){
+                flag = false;
+                continue;
+            }
+
             String text = "";
             try {
                 text = ((TdApi.MessageText) message.content).text.text;
@@ -145,8 +132,6 @@ public class TelegramController {
                 text = "недопустимый символ";
             }
 
-//            System.out.println("call ");
-//            clients.get(token).getClientId();
             list.add(new TelegramMess(message.id, text, message.date, clients.get(token).getMessageType(message)));
 
         }

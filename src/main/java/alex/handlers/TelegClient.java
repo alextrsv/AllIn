@@ -4,6 +4,8 @@ import alex.ServerApplication;
 import alex.entity.DialogToUser;
 import alex.model.Dialog;
 import alex.service.DialogToUserService;
+import alex.service.UserService;
+import alex.service.impl.UserServiceImpl;
 import it.tdlight.common.ExceptionHandler;
 import it.tdlight.common.ResultHandler;
 import it.tdlight.common.TelegramClient;
@@ -24,6 +26,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * (Based on the official TDLib java TelegClientNew)
  */
 public final class TelegClient {
+
+    private final UserService userService = new UserServiceImpl();
+
     private TelegramClient client = null;
     private String phoneNumber = "";
     private String code = "";
@@ -81,10 +86,13 @@ public final class TelegClient {
     private boolean isBeen = false;
 //    private int directoryNumber = 0;
 
-    private long messRandId = -1;
+    private long messRandId = 0;
     private int userId = 0;
     private boolean flag = true;
+
     private volatile List<Dialog> dialogs = new ArrayList<>();
+
+
     private volatile int numberOfFiles = 0;
     private String token;
     private String prefix = "http://dry-brook-08386.herokuapp.com";
@@ -416,6 +424,7 @@ public final class TelegClient {
                             chatPhotoLock.unlock();
                         }
                         ServerApplication.logger.info("SPACE");
+
                     }
                 }
             }
@@ -1118,7 +1127,18 @@ public final class TelegClient {
                 case TdApi.UpdateNewMessage.CONSTRUCTOR:
                     ServerApplication.logger.info("TdApi.UpdateNewMessage.CONSTRUCTOR");
                     TdApi.Message message = ((TdApi.UpdateNewMessage) object).message;
-                    SocketHandler.sendMessageFromTelegram(message, token, getMessageType(message), messRandId);
+                    boolean out = message.isOutgoing;
+
+                    if(userService == null){
+                        ServerApplication.logger.info("userService = null");
+                    }
+
+                    if(out && messRandId > 0) {
+                        SocketHandler.sendMessageFromTelegram(message, token, "out", messRandId, userService.getByToken(token).getMsgToken());
+                        messRandId = 0;
+                    }else{
+                        SocketHandler.sendMessageFromTelegram(message, token, getMessageType(message), 0l, userService.getByToken(token).getMsgToken());
+                    }
 
                 default:
                     // print("Unsupported update:" + newLine + object);

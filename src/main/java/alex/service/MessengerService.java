@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface MessengerService {
 
-
     Response changePosition(String token, MessengerDto messenger);
     void removeMessenger(String token, List<Messenger> messengersToDelete);
     void delete(int id);
