@@ -3,22 +3,12 @@ package alex.handlers;
 import alex.ServerApplication;
 import alex.controllers.MessageController;
 import alex.controllers.TelegramController;
-import alex.entity.DialogToUser;
-import alex.entity.User;
 import alex.fcm_base.FCMService;
 import alex.model.PushNotificationRequest;
-import alex.service.DialogService;
-import alex.service.DialogToUserService;
-import alex.service.UserService;
-import alex.service.impl.DialogToUserServiceImpl;
-import alex.service.impl.UserServiceImpl;
-import com.google.gson.Gson;
-import com.sun.xml.bind.v2.TODO;
 import it.tdlight.jni.TdApi;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -26,7 +16,6 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -82,10 +71,6 @@ public class SocketHandler extends TextWebSocketHandler {
                     logger.info("Can't send message to sender");
                 }
 
-//                if (dialogToUserService == null) {
-//                    ServerApplication.logger.info("dialogToUserService = null");
-//                }
-
                 break;
             case 2:
                 break;
@@ -123,14 +108,11 @@ public class SocketHandler extends TextWebSocketHandler {
 
             PushNotificationRequest pushNotificationRequest = new PushNotificationRequest();
 
-            //Все параметры берутся из бд
-            ///ПРОБЛЕМА
             pushNotificationRequest.setToken(msgToken);
             pushNotificationRequest.setTitle(token);
             pushNotificationRequest.setMessage(((TdApi.MessageText) message.content).text.text);
             pushNotificationRequest.setMap(map);
 
-//            PushNotificationService pushNotificationService = new PushNotificationService(new FCMService());
             FCMService service = new FCMService();
             logger.info("bool = " + service);
 

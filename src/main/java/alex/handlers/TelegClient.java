@@ -306,10 +306,6 @@ public final class TelegClient {
                     Dialog d = new Dialog(chatId, chat.title);
                     needLocked[0] = true;
 
-                    //вставка в таблицу значений
-//                    dialogToUserService.saveDialogToUser(new DialogToUser());
-
-
                     client.send(new TdApi.GetChat(chatId), new ResultHandler() {
                         @Override
                         public void onResult(TdApi.Object object) {
@@ -322,7 +318,6 @@ public final class TelegClient {
 //                                    ServerApplication.logger.info("chat1 = " + chat1);
 
                                     try {
-//                                        d.setLastMsg_date(new Date(chat1.lastMessage.date * 1000L));
                                         d.setLastMsg_date(chat1.lastMessage.date);
                                     } catch (Exception e) {
                                         d.setLastMsg_date(-1);

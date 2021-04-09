@@ -118,6 +118,15 @@ public class TelegramController {
 
         TdApi.Message[] messages = clients.get(token).getHistoryFromChat(chatId, 0, 50);
         System.out.println("messages were gotten");
+
+        try {
+            if (messages[0].id == lastMess.id) {
+                list.remove(0);
+            }
+        }catch (Exception e){
+            ServerApplication.logger.error("messages[0].id == lastMess.id + mess = " + e.getMessage());
+        }
+
         for (TdApi.Message message:
                 messages) {
 
