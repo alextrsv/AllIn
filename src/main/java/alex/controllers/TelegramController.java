@@ -89,6 +89,10 @@ public class TelegramController {
 //            chatService.addChat(d.getId(), token, mess_id);
 //        }
 
+        if(clients.get(token) == null){
+            ServerApplication.logger.error("get() == null");
+        }
+
         return clients.get(token).gci();
     }
 

@@ -277,6 +277,12 @@ public final class TelegClient {
 
         int limit = 20;
         //попробовать возвращать число, чтобы избавиться от лишних await
+
+        if(client == null){
+            ServerApplication.logger.info("client == null");
+        }
+
+        ServerApplication.logger.info("before getMainChatList + token = " + token);
         getMainChatList(limit);
 
 
