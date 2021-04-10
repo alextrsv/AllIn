@@ -99,8 +99,8 @@ public class DialogServiceImpl implements DialogService {
         User user = userRepository.findByToken(token);
 
         for (Dialog dg : dialogs) {
-            Dialog dialog = dialogRepository.findBy2Ids(dg.getApiDialogId(), dg.getMessId());
-//            Dialog dialog = dialogRepository.findById(dg.getId()).get();
+//            Dialog dialog = dialogRepository.findBy2Ids(dg.getApiDialogId(), dg.getMessId());
+            Dialog dialog = dialogRepository.findById(dg.getId()).get();
             DialogToUser dialogToUser = dialogToUserRepository.findByDidUid(dialog.getId(), user.getId());
             if (dialogToUser == null)
                 return new Response("у пользователя нет диалога c id = " + dialog.getId());
@@ -126,8 +126,8 @@ public class DialogServiceImpl implements DialogService {
         User user = userRepository.findByToken(token);
         List<DialogToUser> dialogsToUserToDelete = new ArrayList<DialogToUser>();
         for (Dialog dg : dialogs) {
-            Dialog goalDialog = dialogRepository.findBy2Ids(dg.getApiDialogId(), dg.getMessId());
-            dialogsToUserToDelete.add(dialogToUserRepository.findByDidUid(goalDialog.getId(), user.getId()));
+//            Dialog goalDialog = dialogRepository.findBy2Ids(dg.getApiDialogId(), dg.getMessId());
+            dialogsToUserToDelete.add(dialogToUserRepository.findByDidUid(dg.getId(), user.getId()));
         }
 
         if (deleteFromFavourites) {
