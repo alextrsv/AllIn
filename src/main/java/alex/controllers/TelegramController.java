@@ -162,4 +162,9 @@ public class TelegramController {
         return list;
     }
 
+    @GetMapping("/ping")
+    public void ping(){
+        ServerApplication.logger.info("ping");
+    }
+
 }
