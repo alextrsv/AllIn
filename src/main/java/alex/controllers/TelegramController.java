@@ -168,8 +168,5 @@ public class TelegramController {
                 dialogsToUsers) {
             System.out.println(d.getDialog().getId() + " " + d.getUser().getMsgToken());
         }
-
     }
-
-
 }

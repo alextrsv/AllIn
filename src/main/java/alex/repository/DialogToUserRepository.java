@@ -1,8 +1,6 @@
 package alex.repository;
 
-import alex.entity.Dialog;
 import alex.entity.DialogToUser;
-import alex.entity.UsersMessengers;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

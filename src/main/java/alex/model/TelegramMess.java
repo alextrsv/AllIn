@@ -1,7 +1,5 @@
 package alex.model;
 
-import java.util.Date;
-
 public class TelegramMess {
     private long mess_id;
     private String mess_text;

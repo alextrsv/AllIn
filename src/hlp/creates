@@ -31,13 +31,12 @@ CREATE TABLE category(
 );
 
 CREATE TABLE dialog(
-        id SERIAL PRIMARY KEY,
-        title TEXT,
-        icon TEXT,
-        note TEXT,
-        messenger_id INTEGER REFERENCES messenger(id)
+    id SERIAL PRIMARY KEY,
+    note TEXT,
+    api_dialog_id INTEGER,
+    messenger_id INTEGER REFERENCES messenger(id),
+    CONSTRAINT dialog_unique UNIQUE (api_dialog_id, messenger_id)
 );
-
 
 CREATE TABLE dialog_to_user(
         id SERIAL UNIQUE,
