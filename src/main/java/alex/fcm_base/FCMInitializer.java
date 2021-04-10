@@ -26,7 +26,7 @@ public class FCMInitializer {
         try {
             FirebaseOptions options = new FirebaseOptions.Builder()
 //                    .setCredentials(GoogleCredentials.fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())).build();
-            .setCredentials(GoogleCredentials.fromStream(new FileInputStream(firebaseConfigPath))).build();
+                    .setCredentials(GoogleCredentials.fromStream(new FileInputStream(firebaseConfigPath))).build();
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
                 logger.info("Firebase application has been initialized");

@@ -1,33 +1,32 @@
 package alex.controllers;
 
 import alex.ServerApplication;
+import alex.entity.DialogToUser;
 import alex.handlers.TelegClient;
 import alex.model.Dialog;
 import alex.model.TelegramMess;
-import alex.service.UserService;
+import alex.service.DialogToUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.tdlight.common.Init;
 import it.tdlight.common.utils.CantLoadLibrary;
 import it.tdlight.jni.TdApi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class TelegramController {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ApplicationContext context;
+//    @Autowired
+//    private ChatService chatService;
 
     @Autowired
     ObjectMapper mapper;
-
     public static Map<String, TelegClient> clients = new HashMap<>();
     private int directoryNumber = 11;
 
@@ -55,23 +54,12 @@ public class TelegramController {
 
         ServerApplication.logger.info("telegram_auth" + phone + mess_id);
         try {
-//            TelegClient client = new TelegClient();
-            if(context == null){
-                ServerApplication.logger.error("context == null");
-            }
-
-            TelegClient client = context.getBean(TelegClient.class);
-
+            TelegClient client = new TelegClient();
             client.setPhoneNumber(phone);
             ServerApplication.logger.info("token = " + token);
             clients.put(token, client);
             client.createNewClient(directoryNumber);
             client.setToken(token);
-
-            //DELETE
-            client.userService = userService;
-
-
             directoryNumber++;
         }catch (Exception ex){
             ServerApplication.logger.info("Authorization failed");
@@ -100,10 +88,6 @@ public class TelegramController {
 //            chatService.addChat(d.getId(), token, mess_id);
 //        }
 
-        if(clients.get(token) == null){
-            ServerApplication.logger.error("get() == null");
-        }
-
         return clients.get(token).gci();
     }
 
@@ -117,6 +101,27 @@ public class TelegramController {
     @GetMapping(value = "/telegram_history/{mess_id}/{chat_id}", produces = "application/json")
     @ResponseBody
     public List<TelegramMess> telegramGetChatHistory(@RequestHeader("Authorization") String token, @PathVariable("chat_id") long chatId){
+//        TdApi.Message[] messages = clients.get(token).getHistoryFromChat(chatId, 0, 50);
+//
+//        System.out.println("messages were got");
+//        List<TelegramMess> list = new ArrayList<>();
+//        for (TdApi.Message message:
+//                messages) {
+//
+//            String text = "";
+//            try {
+//                text = ((TdApi.MessageText) message.content).text.text;
+//            }catch(ClassCastException ex){
+//                text = "недопустимый символ";
+//            }
+//
+////            System.out.println("call ");
+////            clients.get(token).getClientId();
+//            list.add(new TelegramMess(message.id, text, new Date(message.date*1000L), clients.get(token).getMessageType(message)));
+//        }
+//
+//        return list;
+
         List<TelegramMess> list = new ArrayList<>();
         String lastMsgText = "";
         TdApi.Message lastMess = clients.get(token).getHistoryFromChat(chatId, 0, 1)[0];
@@ -127,26 +132,13 @@ public class TelegramController {
         }
 
         list.add(new TelegramMess(lastMess.id, lastMsgText, lastMess.date, clients.get(token).getMessageType(lastMess)));
-        ServerApplication.logger.info("size = " + list.size() + "lastMsgText = " + lastMsgText);
 
         System.out.println("Last Message was gotten!");
 
         TdApi.Message[] messages = clients.get(token).getHistoryFromChat(chatId, 0, 50);
         System.out.println("messages were gotten");
-
-        try {
-            if (messages[0].id == lastMess.id) {
-                list.remove(0);
-            }
-        }catch (Exception e){
-            ServerApplication.logger.error("messages[0].id == lastMess.id + mess = " + e.getMessage());
-        }
-
         for (TdApi.Message message:
                 messages) {
-
-            ServerApplication.logger.info(message.toString());
-
             String text = "";
             try {
                 text = ((TdApi.MessageText) message.content).text.text;
@@ -154,17 +146,30 @@ public class TelegramController {
                 text = "недопустимый символ";
             }
 
+//            System.out.println("call ");
+//            clients.get(token).getClientId();
             list.add(new TelegramMess(message.id, text, message.date, clients.get(token).getMessageType(message)));
 
         }
 
-        ServerApplication.logger.info("end size = " + list.size());
         return list;
     }
 
-    @GetMapping("/ping")
-    public void ping(){
-        ServerApplication.logger.info("ping");
+    @Autowired
+    DialogToUserService dialogToUserService;
+
+    @GetMapping(value="/test")
+    public void test(/*@RequestHeader("Authorization") String token*/){
+//        DialogToUserService dialogToUserService = new DialogToUserServiceImpl();
+
+        List<DialogToUser> dialogsToUsers = dialogToUserService.getUsersByChatId(817388954);
+
+        for (DialogToUser d:
+                dialogsToUsers) {
+            System.out.println(d.getDialog().getId() + " " + d.getUser().getMsgToken());
+        }
+
     }
+
 
 }

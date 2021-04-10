@@ -5,18 +5,20 @@ import alex.dto.MessengerDto;
 import alex.dto.Response;
 import alex.entity.Messenger;
 import alex.entity.User;
+import alex.exceptions.MessengerAlreadyOwnedException;
+import alex.exceptions.NoSuchUserException;
 
 
 public interface UserService {
 
 
-    Response setMsgToken(String token, String msgToken);
+    void setMsgToken(String token, String msgToken) throws NoSuchUserException;
     User addUser(String token, User newUser);
-    Iterable<Messenger> getUsersMess(String token);
-    void addMessenger(String token, String accessToken, MessengerDto messengerDto);
+    Iterable<Messenger> getUsersMess(String token) throws NoSuchUserException;
+    void addMessenger(String token, String accessToken, MessengerDto messengerDto) throws  MessengerAlreadyOwnedException, NoSuchUserException;
 
-    String delete(String token);
-    User getByToken(String token);
+    void delete(String token) throws NoSuchUserException;
+    User getByToken(String token) throws NoSuchUserException;
     User getById(int id);
     Iterable<User> getAll();
 

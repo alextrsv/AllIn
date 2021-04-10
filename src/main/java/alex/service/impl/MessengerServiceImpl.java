@@ -1,17 +1,16 @@
 package alex.service.impl;
 
 import alex.dto.MessengerDto;
-import alex.dto.Response;
-import alex.dto.ResponseStatus;
 import alex.entity.Messenger;
 import alex.entity.User;
 import alex.entity.UsersMessengers;
+import alex.exceptions.NoSuchMesengerOwnedException;
+import alex.exceptions.NoSuchUserException;
 import alex.repository.MessengerRepository;
 import alex.repository.UserRepository;
 import alex.repository.UsersMessengersRepository;
 import alex.service.MessengerService;
-import alex.service.UsersMessengersService;
-import org.checkerframework.checker.units.qual.A;
+import alex.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,23 +31,33 @@ public class MessengerServiceImpl implements MessengerService {
     @Autowired
     UsersMessengersRepository usersMessengersRepository;
 
+    @Autowired
+    UserService userService;
+
 
     @Override
-    public Response changePosition(String token, MessengerDto messenger) {
+    public void changePosition(String token, MessengerDto messenger) throws NoSuchUserException, NoSuchMesengerOwnedException {
+        if (userRepository.findByToken(token) == null) throw new NoSuchUserException(token);
+
         UsersMessengers usersMessengers =
                 usersMessengersRepository.findByUIdMId(userRepository.findByToken(token).getId(), messenger.getId());
+
+        if(usersMessengers == null) throw new NoSuchMesengerOwnedException(messenger.getId(), token);
 
         usersMessengers.setPosition(messenger.getPosition());
         usersMessengersRepository.save(usersMessengers);
 
-        return new Response(ResponseStatus.SUCCESS, "position has been changed");
     }
 
     @Override
-    public void removeMessenger(String token, List<Messenger> messengersToDelete) {
-        User user = userRepository.findByToken(token);
+    public void removeMessenger(String token, List<Messenger> messengersToDelete)
+            throws NoSuchUserException, NullPointerException, NoSuchMesengerOwnedException {
+
+        User user = userService.getByToken(token);
+
         for (Messenger mess: messengersToDelete) {
-            UsersMessengers usersMessengers =  usersMessengersRepository.findByUIdMId(user.getId(), mess.getId());
+            UsersMessengers usersMessengers = usersMessengersRepository.findByUIdMId(user.getId(), mess.getId());
+            if (usersMessengers == null) throw new NoSuchMesengerOwnedException(mess.getId(), token);
             usersMessengersRepository.deleteById(usersMessengers.getId());
         }
     }
