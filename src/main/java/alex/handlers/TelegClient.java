@@ -12,6 +12,9 @@ import it.tdlight.common.TelegramClient;
 import it.tdlight.jni.TdApi;
 import it.tdlight.tdlight.ClientManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.*;
@@ -25,6 +28,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * TelegClientNew class for TDLib usage from Java.
  * (Based on the official TDLib java TelegClientNew)
  */
+
+@Component
+@Scope("prototype")
 public final class TelegClient {
 
     public UserService userService;

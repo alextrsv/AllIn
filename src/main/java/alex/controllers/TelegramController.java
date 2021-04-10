@@ -11,6 +11,7 @@ import it.tdlight.common.Init;
 import it.tdlight.common.utils.CantLoadLibrary;
 import it.tdlight.jni.TdApi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -22,7 +23,11 @@ public class TelegramController {
     private UserService userService;
 
     @Autowired
+    private ApplicationContext context;
+
+    @Autowired
     ObjectMapper mapper;
+
     public static Map<String, TelegClient> clients = new HashMap<>();
     private int directoryNumber = 11;
 
@@ -50,7 +55,13 @@ public class TelegramController {
 
         ServerApplication.logger.info("telegram_auth" + phone + mess_id);
         try {
-            TelegClient client = new TelegClient();
+//            TelegClient client = new TelegClient();
+            if(context == null){
+                ServerApplication.logger.error("context == null");
+            }
+
+            TelegClient client = context.getBean(TelegClient.class);
+
             client.setPhoneNumber(phone);
             ServerApplication.logger.info("token = " + token);
             clients.put(token, client);
