@@ -37,6 +37,7 @@ public class StorageController {
                 .header("Content-type", "application/octet-stream")
                 .header("Content-disposition", "attachment; filename=\"" + fileName + "\"")
                 .body(resource);
+        //http://localhost:8080/file/download/ooo.jpg
     }
 
     @DeleteMapping("/delete/{fileName}")

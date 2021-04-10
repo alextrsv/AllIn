@@ -8,6 +8,7 @@ import alex.exceptions.NoSuchMesengerOwnedException;
 import alex.repository.*;
 import alex.service.CommonService;
 import alex.service.DialogService;
+import org.apache.tomcat.jni.Time;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.stereotype.Service;
@@ -59,9 +60,8 @@ public class DialogServiceImpl implements DialogService {
             throw new NoSuchMesengerOwnedException(messId, userTo.getToken());
         else {
             Dialog dialog = new Dialog();
-            dialog.setIcon("Icon3");
+            dialog.setApiDialogId((long) (Math.random() * 300));
             dialog.setNote("testing http dialog adding");
-            dialog.setTitle("DIALOG3");
             dialog.setMessenger(messengerRepository.findById(messId).get());
 
             DialogToUser dialogToUserFrom = new DialogToUser();
@@ -99,7 +99,8 @@ public class DialogServiceImpl implements DialogService {
         User user = userRepository.findByToken(token);
 
         for (Dialog dg : dialogs) {
-            Dialog dialog = dialogRepository.findById(dg.getId()).get();
+            Dialog dialog = dialogRepository.findBy2Ids(dg.getApiDialogId(), dg.getMessId());
+//            Dialog dialog = dialogRepository.findById(dg.getId()).get();
             DialogToUser dialogToUser = dialogToUserRepository.findByDidUid(dialog.getId(), user.getId());
             if (dialogToUser == null)
                 return new Response("у пользователя нет диалога c id = " + dialog.getId());
@@ -125,7 +126,8 @@ public class DialogServiceImpl implements DialogService {
         User user = userRepository.findByToken(token);
         List<DialogToUser> dialogsToUserToDelete = new ArrayList<DialogToUser>();
         for (Dialog dg : dialogs) {
-            dialogsToUserToDelete.add(dialogToUserRepository.findByDidUid(dg.getId(), user.getId()));
+            Dialog goalDialog = dialogRepository.findBy2Ids(dg.getApiDialogId(), dg.getMessId());
+            dialogsToUserToDelete.add(dialogToUserRepository.findByDidUid(goalDialog.getId(), user.getId()));
         }
 
         if (deleteFromFavourites) {

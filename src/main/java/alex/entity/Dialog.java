@@ -10,11 +10,8 @@ public class Dialog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "title")
-    String title;
-
-    @Column(name = "icon")
-    String icon;
+    @Column(name = "api_dialog_id")
+    private long apiDialogId;
 
     @Column(name = "note")
     String note;
@@ -26,6 +23,9 @@ public class Dialog {
     @JoinColumn(name = "messenger_id")
     private Messenger messenger;
 
+    //for DTO
+    @Transient
+    private int messId;
 
     //реализация связи М:М (диалоги - пользователи)
     @OneToMany(mappedBy = "dialog")
@@ -41,20 +41,12 @@ public class Dialog {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public long getApiDialogId() {
+        return apiDialogId;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setApiDialogId(long apiDialogId) {
+        this.apiDialogId = apiDialogId;
     }
 
     public String getNote() {
@@ -71,5 +63,13 @@ public class Dialog {
 
     public void setMessenger(Messenger messenger) {
         this.messenger = messenger;
+    }
+
+    public int getMessId() {
+        return messId;
+    }
+
+    public void setMessId(int messId) {
+        this.messId = messId;
     }
 }
